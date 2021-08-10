@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Solver</title>
+    <link rel="stylesheet" href={{url_for("static", filename="css/style.css" )}}>
+    <link rel="stylesheet" href={{url_for("static", filename="css/normalize.css" )}}>
+    <style>
+        @font-face {
+                    font-family: Bruno Ace Regular;
+                    src: url({{url_for("static", filename="fonts/Bruno Ace Regular.ttf")}})
+        }
+    </style>
+    <script>initialGrid = {{grid}}</script>
+    <script src={{url_for("static", filename="js/script.js" )}} defer></script>
+</head>
+
+<body>
+    <div id="content">
+        <div id="focus-content">
+            <h1 class="header">SUDOKU SOLVER</h1>
+            <section id="grid-and-menu">
+                <div class="grid-container">
+                    <ul id="grid"></ul>
+                </div>
+                <div class="menu-section">
+                    <button class="btn" onclick="solve()">SOLVE</button>
+                    <button class="btn" onclick="clearGrid()">CLEAR</button>
+                </div>
+            </section>
+        </div>
+        <footer class="footer">
+            <div id="footer-content">
+                <small>by</small>
+                <img src={{url_for("static", filename="images/label.svg")}}>
+                <small>{{version}}</small>
+            </div>
+        </footer>
+        <div id="notify-bar">
+            <div id="notify-bar__content">
+                <small id="notification"></small>
+            </div>
+            <button id="notify-bar__button" onclick="hideNotification()" title="Hide">&#10006;</button>
+        </div>
+    </div>
+    
+    <div id="foreground">
+        <object id="holderSVG" type="image/svg+xml" data={{url_for("static", filename="images/holder.svg")}}></object>
+    </div>
+    <div id="initial-foreground"></div>
+</body>
+
+</html>
