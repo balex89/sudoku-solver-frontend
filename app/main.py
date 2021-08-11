@@ -16,5 +16,5 @@ config.read_file(open('app/sudokuFrontend.ini', 'r'))
 pathlib.Path('app/logs').mkdir(exist_ok=True)
 logging.config.fileConfig('app/logging.ini')
 
-flask_app = flask.Flask(__name__)
+app = flask.Flask(__name__)
 init_routes()

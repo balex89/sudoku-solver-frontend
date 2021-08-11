@@ -1,6 +1,6 @@
 class Grid(list):
     """
-        The Wrapper for a list of list of values (1,..,9 or None), representing Sudoku grid.
+        A Wrapper for a list of list of values (1,..,9 or None), representing Sudoku grid.
         Provides methods for compact URL-safe encoding of valid and invalid grids.
 
         Tip 1: Use encode_1() / decode_1() methods for valid grids.
@@ -44,7 +44,7 @@ class Grid(list):
     class Batch(list):
         """
             A representation of a grid row or column.
-            > batch(i) - returns Set of batch values except the one on position i.
+            > batch(i) - returns set of batch values except the one in position i.
         """
         def __call__(self, i):
             return set(self[j] for j in range(len(self)) if j != i)
@@ -92,7 +92,7 @@ class Grid(list):
         """
             Encodes given string of binary code to string of symbols.
             Simply takes each next batch of 6 bits, converts to int
-            and adds the symbol on corresponding position in B64 string:
+            and adds the symbol in corresponding position in B64 string:
             [000000][000001][000   ] <- adds zeros to match size of 6.
               is A    is B    is A   -> "ABA"
         """
@@ -103,7 +103,7 @@ class Grid(list):
 
     @classmethod
     def b64_to_bin(cls, string):
-        """ Reversed bin_to_b64 """
+        """ Reverses bin_to_b64 """
         return ''.join(f'{cls.FB64[c]:06b}' for c in string)
 
     def encode_1(self, bin_prefix=""):
@@ -114,6 +114,7 @@ class Grid(list):
 
             if grid.is_valid(), less bits needed for cell with less alternatives (grid.alts(i, j)),
             also more bit sequences stand for longer blank cell rows.
+
             The first bit in binary code stands for validation flag.
 
             Tip: Works well for grids with rare filled cells.
@@ -182,7 +183,7 @@ class Grid(list):
 
     def encode_3(self, bin_prefix=""):
         """
-            Encodes the grid by converting each next 3 digit ("0" stands for a blank cells)
+            Encodes the grid by converting each next 3 digits ("0" stands for a blank cell)
             as a number to 10 bit length binary code. Then applies bin_to_b64.
             Gives compact encoding for straight rows of blank cells (up to 27 cells).
 

@@ -40,11 +40,11 @@ Works well on desktop browsers:
 
 Best in 640 x 910 resolution or higher.
 
-_Mobile devices are not yet supported!_
+_Mobile devices are poorly supported._
 
 ## Sudoku grid encoding
 
-Any time Sudoku grid is changed, it's current state is immediately encoded and put right into URL of browser address bar `/~<code>`, e.g.:
+Any time Sudoku grid is changed, it's current state is immediately encoded and put right into URL of browser address bar (`.../~<code>`), e.g.:
 
 ```
 http://localhost:5001/~hFEB_iAwZIFzybz14z-gDafDf4tRy

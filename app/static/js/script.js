@@ -1,3 +1,8 @@
+// Constants
+
+const CONTENT_WIDTH = 640;
+const CONTENT_HEIGHT = 910;
+
 // Cell value converters
 
 function toCellValue(s) {
@@ -172,6 +177,7 @@ const solve = longCall(async () => {
 
 const cellSetKeys = new Set(["1", "2", "3", "4", "5", "6", "7", "8", "9"])
 const cellClearKeys = new Set(["Backspace", " ", "Delete"])
+const previousCellValues = {}
 
 document.onkeydown = (e) => {
     const elem = document.activeElement;
@@ -183,22 +189,44 @@ document.onkeydown = (e) => {
         } else {
             return;
         };
+        previousCellValues[elem.id] = elem.value;
         encode_grid();
     }
 }
+
+const resetPreviousValue = function (elem) {
+    elem.value = previousCellValues[elem.id] || "";
+};
 
 
 // Content resizing
 
 function rescale_content() {
-    gridAndMenu = document.getElementById("grid-and-menu");
-    setStyles(gridAndMenu, {
-        "transform": `scale(${Math.min(window.innerWidth / gridAndMenu.offsetWidth, 1)})`,
+
+    const content = document.getElementById("content");
+
+    const scale = Math.min(window.innerWidth / CONTENT_WIDTH, window.innerHeight / CONTENT_HEIGHT, 1);
+
+    setStyles(content, {
+        "transform": `scale(${scale})`,
         "transform-origin": "top left"
     });
+
+    if (scale == 1) {
+        content.style.removeProperty("width");
+        setStyles(content, {
+            "left": 0
+        });
+    } else {
+        setStyles(content, {
+            "width": CONTENT_WIDTH + "px",
+            "left": Math.max((window.innerWidth - CONTENT_WIDTH * scale) / 2, 0) + "px"
+        });
+    };
+
 }
 
-window.addEventListener("resize", rescale_content)
+window.addEventListener("resize", rescale_content);
 
 
 // HTML Initalization
@@ -206,20 +234,21 @@ window.addEventListener("resize", rescale_content)
 window.onload = function () {
 
     getSolverHealth();
-    rescale_content();
+
     let gridHtml = "";
     for (let i = 0; i < 9; i++) {
         gridHtml += `<ul class="grid__row">`
         for (let j = 0; j < 9; j++) {
             gridHtml += `
                 <li class="grid__item">
-                <input type="text" id="Cell(${i},${j})" class="grid__input" readonly="readonly">
+                <input type="text" id="Cell(${i},${j})" class="grid__input" inputmode="numeric" oninput="resetPreviousValue(this);">
                 </li>
             `
         }
         gridHtml += `</ul>`
     };
     document.getElementById("grid").innerHTML = gridHtml;
+    rescale_content();
 
     if (initialGrid) {
         fillGrid(initialGrid);
@@ -230,7 +259,6 @@ window.onload = function () {
         "pointer-events": "none"
     })
 }
-
 
 
 // Test utils

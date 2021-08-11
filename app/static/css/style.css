@@ -203,7 +203,7 @@ html {
     border-radius: 5px;
     text-align: center;
     font-size: 28px;
-    /* caret-color: transparent; */
+    caret-color: transparent;
     cursor: default;
 }
 

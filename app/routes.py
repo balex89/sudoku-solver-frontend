@@ -5,18 +5,12 @@ import os
 
 from flask import request, Response, jsonify, render_template, send_from_directory, redirect
 
-from app.main import flask_app, config
+from app.main import app, config
 from app.grid import Grid
 
 SOLVER_APP_HOST = config['solverService']['host']
 SOLVER_APP_PORT = config['solverService']['port']
 
-logging.basicConfig(
-    style='{',
-    format='{asctime}.{msecs:03.0f} {name}:{lineno} {levelname} - {message}',
-    datefmt='%Y.%m.%d %H:%M:%S',
-    level=logging.INFO
-)
 logger = logging.getLogger(__name__)
 
 
@@ -24,8 +18,8 @@ def init():
     logger.info("Init app routes")
 
 
-@flask_app.route("/")
-@flask_app.route("/~<code>")
+@app.route("/")
+@app.route("/~<code>")
 def home(code=None):
     try:
         grid = json.dumps(None if code is None else Grid.decode(code))
@@ -36,13 +30,13 @@ def home(code=None):
     return render_template("index.html.j2", grid=grid, version=config['app']['version'])
 
 
-@flask_app.route('/favicon.ico')
+@app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(flask_app.root_path, 'static/images'),
+    return send_from_directory(os.path.join(app.root_path, 'static/img'),
                                'favicon.svg', mimetype='image/svg+xml')
 
 
-@flask_app.route("/solver-health", methods=["GET"])
+@app.route("/solver-health", methods=["GET"])
 def solver_health():
     resp = requests.request(
         method="GET",
@@ -52,7 +46,7 @@ def solver_health():
     return Response(resp.content, resp.status_code, resp.raw.headers.items())
 
 
-@flask_app.route("/solve", methods=["POST"])
+@app.route("/solve", methods=["POST"])
 def solve():
 
     resp = requests.request(
@@ -64,19 +58,19 @@ def solve():
     return Response(resp.content, resp.status_code, resp.raw.headers.items())
 
 
-@flask_app.route("/encode", methods=["GET"])
+@app.route("/encode", methods=["GET"])
 def encode():
     numbers = request.args['numbers']
     return Grid.from_str(numbers).encode()
 
 
-@flask_app.errorhandler(400)
+@app.errorhandler(400)
 def handle_bad_request(e):
     logger.exception("Bad request")
     return jsonify(status="error", error=str(e)), 400
 
 
-@flask_app.errorhandler(Exception)
+@app.errorhandler(Exception)
 def handle_internal_error(e):
     logger.exception("Internal Server Error")
     return jsonify(status="error", error=str(e)), 500
