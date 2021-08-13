@@ -14,6 +14,10 @@ class Grid(list):
 
     @classmethod
     def from_str(cls, string):
+        """
+            Reads grid as a string of 81 values ("0" stands for a blank cell)
+            given row by row, e.g.: "001003024020000056..."
+        """
         return cls(
             [
                 [int(x) if (x := string[j * 9 + i]) != '0' else None for i in range(9)]
@@ -23,7 +27,7 @@ class Grid(list):
 
     class Squares:
         """
-            A representation of grid rows with two ways to get a Set of 3x3 square values
+            A representation of grid rows with two ways to get a set of 3x3 square values
             by i, j coordinates of one of its cells:
             > squares[i, j] - including the (i, j) cell,
             > squares(i, j) - excluding it.
@@ -67,7 +71,7 @@ class Grid(list):
         return cls([cls.Batch([None] * 9) for _ in range(9)])
 
     def alts(self, i, j) -> list:
-        """ List of possible (according to sudoku rules) alternatives for the (i, j) cell  """
+        """ Sorted list of possible (according to sudoku rules) alternatives for the (i, j) cell """
         return sorted(self.ALL_ALTS_SET - self[i](j) - self.c[j](i) - self.s(i, j) | {0})
 
     def is_valid(self, *args):
