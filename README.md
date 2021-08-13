@@ -1,6 +1,7 @@
 # Sudoku Solver Frontend
 
-An HTTP web application serving user interface specifically for [this Sudoku Solver tool](https://github.com/balex89/sudoku-solver) (maintained by [@balex89](https://github.com/balex89)).
+An HTTP web application serving user interface specifically for [this Sudoku Solver tool](https://github.com/balex89/sudoku-solver) (maintained by [@balex89](https://github.com/balex89)). Solver service API v1 is used.
+
 
 Provides a user with a [Sudoku](https://en.wikipedia.org/wiki/Sudoku) grid to fill in, and a button to show the solution in place.
 Works with [basic puzzle rules](https://www.learn-sudoku.com/sudoku-rules.html).

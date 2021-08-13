@@ -8,8 +8,7 @@ from flask import request, Response, jsonify, render_template, send_from_directo
 from app.main import app, config
 from app.grid import Grid
 
-SOLVER_APP_HOST = config['solverService']['host']
-SOLVER_APP_PORT = config['solverService']['port']
+SOLVER_API_URL = config["solverService"]["api_url"]
 
 logger = logging.getLogger(__name__)
 
@@ -27,20 +26,20 @@ def home(code=None):
         logger.exception('Invalid code string to decode: '
                          '"%s". Caused: %s. Redirecting to "/".', code, type(e).__name__)
         return redirect("/")
-    return render_template("index.html.j2", grid=grid, version=config['app']['version'])
+    return render_template("index.html.j2", grid=grid, version=config["app"]["version"])
 
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static/img'),
-                               'favicon.svg', mimetype='image/svg+xml')
+    return send_from_directory(os.path.join(app.root_path, "static/img"),
+                               "favicon.svg", mimetype="image/svg+xml")
 
 
 @app.route("/solver-health", methods=["GET"])
 def solver_health():
     resp = requests.request(
         method="GET",
-        url=f'http://{SOLVER_APP_HOST}:{SOLVER_APP_PORT}/health',
+        url=SOLVER_API_URL + "/health",
         headers=request.headers,
     )
     return Response(resp.content, resp.status_code, resp.raw.headers.items())
@@ -51,7 +50,7 @@ def solve():
 
     resp = requests.request(
         method="POST",
-        url=f'http://{SOLVER_APP_HOST}:{SOLVER_APP_PORT}/solve',
+        url=SOLVER_API_URL + "/solve",
         headers=request.headers,
         data=request.get_data(),
     )
@@ -60,7 +59,7 @@ def solve():
 
 @app.route("/encode", methods=["GET"])
 def encode():
-    numbers = request.args['numbers']
+    numbers = request.args["numbers"]
     return Grid.from_str(numbers).encode()
 
 
