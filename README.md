@@ -1,6 +1,7 @@
 # Sudoku Solver Frontend
 
-An HTTP web application serving user interface specifically for [this Sudoku Solver tool](https://github.com/balex89/sudoku-solver) (maintained by [@balex89](https://github.com/balex89)).
+An HTTP web application serving user interface specifically for [this Sudoku Solver tool](https://github.com/balex89/sudoku-solver) (maintained by [@balex89](https://github.com/balex89)). Solver service API v1 is used.
+
 
 Provides a user with a [Sudoku](https://en.wikipedia.org/wiki/Sudoku) grid to fill in, and a button to show the solution in place.
 Works with [basic puzzle rules](https://www.learn-sudoku.com/sudoku-rules.html).
@@ -40,11 +41,11 @@ Works well on desktop browsers:
 
 Best in 640 x 910 resolution or higher.
 
-_Mobile devices are not yet supported!_
+_Mobile devices are poorly supported._
 
 ## Sudoku grid encoding
 
-Any time Sudoku grid is changed, it's current state is immediately encoded and put right into URL of browser address bar `/~<code>`, e.g.:
+Any time Sudoku grid is changed, it's current state is immediately encoded and put right into URL of browser address bar (`.../~<code>`), e.g.:
 
 ```
 http://localhost:5001/~hFEB_iAwZIFzybz14z-gDafDf4tRy
