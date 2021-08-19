@@ -6,16 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sudoku Solver</title>
-    <link rel="stylesheet" href={{url_for("static", filename="css/style.css" )}}>
-    <link rel="stylesheet" href={{url_for("static", filename="css/normalize.css" )}}>
+    <link rel="stylesheet" href={{url_for("get_static", filename="css/style.css")}}>
+    <link rel="stylesheet" href={{url_for("get_static", filename="css/normalize.css" )}}>
     <style>
         @font-face {
                     font-family: Bruno Ace Regular;
-                    src: url({{url_for("static", filename="fonts/Bruno Ace Regular.ttf")}})
+                    src: url({{url_for("get_static", filename="fonts/Bruno Ace Regular.ttf" )}})
         }
     </style>
     <script>initialGrid = {{grid}}</script>
-    <script src={{url_for("static", filename="js/script.js" )}} defer></script>
+    <script src={{url_for("get_static", filename="js/script.js" )}} defer></script>
 </head>
 
 <body>
@@ -35,7 +35,7 @@
         <footer class="footer">
             <div id="footer-content">
                 <small>by</small>
-                <img src={{url_for("static", filename="img/label.svg")}}>
+                <img src={{url_for("get_static", filename="img/label.svg")}}>
                 <small>{{version}}</small>
             </div>
         </footer>
@@ -48,7 +48,7 @@
     </div>
     
     <div id="foreground">
-        <object id="holderSVG" type="image/svg+xml" data={{url_for("static", filename="img/holder.svg")}}></object>
+        <object id="holderSVG" type="image/svg+xml" data={{url_for("get_static", filename="img/holder.svg")}}></object>
     </div>
     <div id="initial-foreground"></div>
 </body>

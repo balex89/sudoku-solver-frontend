@@ -8,7 +8,14 @@ from flask import request, Response, jsonify, render_template, send_from_directo
 from app.main import app, config
 from app.grid import Grid
 
-SOLVER_API_URL = config["solverService"]["api_url"]
+SOLVER_API_URL = config.get("solverService", "api_url")
+
+if 'SERVER_NAME' in app.config:
+    SERVER_URL = config.get("domain", "server_url")
+    SUBDOMAIN = config.get("domain", "subdomain")
+    SUBDOMAIN_URL = config.get("domain", "subdomain_url") if SUBDOMAIN else SERVER_URL
+else:
+    SERVER_URL, SUBDOMAIN, SUBDOMAIN_URL = None, None, None
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +24,14 @@ def init():
     logger.info("Init app routes")
 
 
-@app.route("/")
-@app.route("/~<code>")
-def home(code=None):
+@app.route("/static/<path:filename>", subdomain=SUBDOMAIN)
+def get_static(filename):
+    return send_from_directory(os.path.join(app.root_path, "static"), filename)
+
+
+@app.route("/", subdomain=SUBDOMAIN)
+@app.route("/~<code>", subdomain=SUBDOMAIN)
+def sudoku(code=None):
     try:
         grid = json.dumps(None if code is None else Grid.decode(code))
     except Exception as e:
@@ -29,13 +41,13 @@ def home(code=None):
     return render_template("index.html.j2", grid=grid, version=config["app"]["version"])
 
 
-@app.route('/favicon.ico')
+@app.route("/favicon.ico", subdomain=SUBDOMAIN)
 def favicon():
     return send_from_directory(os.path.join(app.root_path, "static/img"),
                                "favicon.svg", mimetype="image/svg+xml")
 
 
-@app.route("/solver-health", methods=["GET"])
+@app.route("/solver-health", methods=["GET"], subdomain=SUBDOMAIN)
 def solver_health():
     resp = requests.request(
         method="GET",
@@ -45,7 +57,7 @@ def solver_health():
     return Response(resp.content, resp.status_code, resp.raw.headers.items())
 
 
-@app.route("/solve", methods=["POST"])
+@app.route("/solve", methods=["POST"], subdomain=SUBDOMAIN)
 def solve():
 
     resp = requests.request(
@@ -57,10 +69,23 @@ def solve():
     return Response(resp.content, resp.status_code, resp.raw.headers.items())
 
 
-@app.route("/encode", methods=["GET"])
+@app.route("/encode", methods=["GET"], subdomain=SUBDOMAIN)
 def encode():
     numbers = request.args["numbers"]
     return Grid.from_str(numbers).encode()
+
+
+@app.route("/", subdomain='<subdomain>')
+def redirect_subdomain(subdomain):
+    logger.info('Redirecting from subdomain "%s" to %s', subdomain, SERVER_URL)
+    return redirect(SERVER_URL)
+
+
+@app.route("/")
+@app.route("/<path:path>")
+def home(path=""):
+    logger.info('Redirecting %s%s to subdomain url %s', SERVER_URL, path, SUBDOMAIN_URL)
+    return redirect(SUBDOMAIN_URL)
 
 
 @app.errorhandler(400)
