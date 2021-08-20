@@ -10,7 +10,7 @@ from app.grid import Grid
 
 SOLVER_API_URL = config.get("solverService", "api_url")
 
-if 'SERVER_NAME' in app.config:
+if "SERVER_NAME" in app.config:
     SERVER_URL = config.get("domain", "server_url")
     SUBDOMAIN = config.get("domain", "subdomain")
     SUBDOMAIN_URL = config.get("domain", "subdomain_url") if SUBDOMAIN else SERVER_URL
@@ -75,16 +75,18 @@ def encode():
     return Grid.from_str(numbers).encode()
 
 
-@app.route("/", subdomain='<subdomain>')
-def redirect_subdomain(subdomain):
-    logger.info('Redirecting from subdomain "%s" to %s', subdomain, SERVER_URL)
+@app.route("/", subdomain="<subdomain>")
+@app.route("/<path:path>", subdomain="<subdomain>")
+def redirect_subdomain(subdomain, path=""):
+    logger.info('Redirecting %s (subdomain "%s" and path /%s) to %s',
+                request.url, subdomain, path, SERVER_URL)
     return redirect(SERVER_URL)
 
 
 @app.route("/")
 @app.route("/<path:path>")
 def home(path=""):
-    logger.info('Redirecting %s%s to subdomain url %s', SERVER_URL, path, SUBDOMAIN_URL)
+    logger.info("Redirecting %s%s to subdomain url %s", SERVER_URL, path, SUBDOMAIN_URL)
     return redirect(SUBDOMAIN_URL)
 
 
