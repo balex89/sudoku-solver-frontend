@@ -65,6 +65,12 @@ server_name = example.com:80
 subdomain = app
 ; ... leave other keys intact
 ```
+To test this feature locally append domain records to [`hosts` file](https://en.wikipedia.org/wiki/Hosts_(file)):
+```
+127.0.0.1 example.com
+127.0.0.1 app.example.com
+127.0.0.1 any_other_subdomain.example.com
+```
 
 ## Run tests
 ```commandline
