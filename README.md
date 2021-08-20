@@ -36,7 +36,9 @@ port = 5000
 ```
 
 #### Subdomain redirecting
-In case you run app on a domain (e.g. `example.com`) and want to redirect there any inappropriate request url like this:
+_Note: for complex URL forwarding consider using specialized solutions like [Nginx](https://nginx.org/) or [Apache HTTP Server](https://httpd.apache.org/)._
+
+In case you run app on a domain (e.g. `example.com`) and want to redirect there any request with inappropriate url like this:
 ```
 http://www.example.com/
 http://any_subdomain.example.com/any/path
