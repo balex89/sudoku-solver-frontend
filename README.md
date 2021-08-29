@@ -27,7 +27,7 @@ pip install -r requirements.txt
 Config file `sudokuFrontend.ini` provides some customization options:
 
 #### Solver service socket
-Is specified in `[solverService]` section. E.g. to run on same host:
+Is specified in `[solverService]` section. E.g. to run on the same host:
 ```ini
 [solverService]
 host = localhost
@@ -51,7 +51,7 @@ server_name = example.com:80
 subdomain =
 ; ... leave other keys intact
 ```
-In case you what to run app on a specific subdomain (e.g. `app.example.com`) and set redirection for urls like:
+In case you want to run app on a specific subdomain (e.g. `app.example.com`) and set redirection for urls like:
 ```
 http://example.com/
 http://example.com/any/path
