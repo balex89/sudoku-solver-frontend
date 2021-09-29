@@ -65,7 +65,7 @@ def encode():
 @app.route ("/validate", methods = ["GET"])
 def validate():
     numbers = request.args["numbers"]
-    return Grid.from_str(numbers).is_valid()
+    return jsonify(is_valid=Grid.from_str(numbers).is_valid())  
 
 
 @app.errorhandler(400)
