@@ -63,6 +63,11 @@ def encode():
     return Grid.from_str(numbers).encode()
 
 
+@app.route("/validate", methods=["GET"])
+def validate_mock():
+    return jsonify(is_valid=True)
+
+
 @app.errorhandler(400)
 def handle_bad_request(e):
     logger.exception("Bad request")
