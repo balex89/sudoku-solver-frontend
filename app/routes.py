@@ -62,10 +62,13 @@ def encode():
     numbers = request.args["numbers"]
     return Grid.from_str(numbers).encode()
 
-@app.route ("/validate", methods = ["GET"])
+
+@app.route("/validate", methods=["GET"])
 def validate():
     numbers = request.args["numbers"]
-    return jsonify(is_valid=Grid.from_str(numbers).is_valid())  
+    if len(numbers) != 81:
+        return jsonify(is_valid=False)
+    return jsonify(is_valid=Grid.from_str(numbers).is_valid())
 
 
 @app.errorhandler(400)
