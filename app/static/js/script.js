@@ -106,11 +106,11 @@ async function validateCell(cell) {
     const is_valid = await is_valid_grid();
     console.log(`is_valid=${is_valid}`);
     if (is_valid === false){
-        setStyles(cell, {"color": "red"})
+        setStyles(cell, {"color": "red", "font-weight": 600})
     } else {
         Array.from(document.getElementsByClassName("grid__input")).forEach(element => {
             console.log(element);
-            setStyles(element, {"color": "black"})
+            setStyles(element, {"color": "black", "font-weight": 400})
         });
     }
 }
