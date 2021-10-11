@@ -75,6 +75,12 @@ def encode():
     return Grid.from_str(numbers).encode()
 
 
+@app.route("/validate", methods=["GET"], subdomain=SUBDOMAIN)
+def validate():
+    numbers = request.args["numbers"]
+    return jsonify(is_valid=Grid.from_str(numbers).is_valid())
+
+
 @app.route("/", subdomain="<subdomain>")
 @app.route("/<path:path>", subdomain="<subdomain>")
 def redirect_subdomain(subdomain, path=""):
@@ -88,12 +94,6 @@ def redirect_subdomain(subdomain, path=""):
 def home(path=""):
     logger.info("Redirecting %s%s to subdomain url %s", SERVER_URL, path, SUBDOMAIN_URL)
     return redirect(SUBDOMAIN_URL)
-
-
-@app.route("/validate", methods=["GET"])
-def validate():
-    numbers = request.args["numbers"]
-    return jsonify(is_valid=Grid.from_str(numbers).is_valid())
 
 
 @app.errorhandler(400)
