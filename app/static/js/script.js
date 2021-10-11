@@ -102,6 +102,19 @@ function fillGrid(grid) {
     encode_grid();
 }
 
+async function validateCell(cell) {
+    const is_valid = await is_valid_grid();
+    console.log(`is_valid=${is_valid}`);
+    if (is_valid === false){
+        setStyles(cell, {"color": "red", "font-weight": 600})
+    } else {
+        Array.from(document.getElementsByClassName("grid__input")).forEach(element => {
+            console.log(element);
+            setStyles(element, {"color": "black", "font-weight": 400})
+        });
+    }
+}
+
 
 // Screen holding
 
@@ -172,6 +185,12 @@ const solve = longCall(async () => {
     };
 })
 
+const is_valid_grid = async () => {
+    const response = await fetch('/validate?' + new URLSearchParams({"numbers": getStringifiedGrid()}));
+    const content = await response.json();
+    return content["is_valid"];
+};
+
 
 // Grid cells value input
 
@@ -184,6 +203,7 @@ document.onkeydown = (e) => {
     if (elem.className == "grid__input") {
         if (cellSetKeys.has(e.key)) {
             elem.value = e.key;
+            validateCell(elem);
         } else if (cellClearKeys.has(e.key)) {
             elem.value = "";
         } else {
