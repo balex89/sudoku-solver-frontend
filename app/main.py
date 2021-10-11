@@ -11,10 +11,13 @@ def init_routes():
 
 
 config = configparser.ConfigParser()
-config.read_file(open('app/sudokuFrontend.ini', 'r'))
+config.read_file(open("app/sudokuFrontend.ini", "r"))
 
-pathlib.Path('app/logs').mkdir(exist_ok=True)
-logging.config.fileConfig('app/logging.ini')
+pathlib.Path("app/logs").mkdir(exist_ok=True)
+logging.config.fileConfig("app/logging.ini")
 
-app = flask.Flask(__name__)
+app = flask.Flask(__name__, subdomain_matching=True)
+if server_name := config.get("domain", "server_name", fallback=""):
+    app.config["SERVER_NAME"] = server_name
+
 init_routes()

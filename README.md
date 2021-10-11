@@ -17,8 +17,59 @@ Featuring immediate URL-safe [grid encoding](#sudoku-grid-encoding).
 - [pip](https://pip.pypa.io/en/stable/)
 
 ## Setup
+
+### Install dependencies:
 ```commandline
 pip install -r requirements.txt
+```
+
+### Configuration:
+Config file `sudokuFrontend.ini` provides some customization options:
+
+#### Solver service socket
+Is specified in `[solverService]` section. E.g. to run on the same host:
+```ini
+[solverService]
+host = localhost
+port = 5000
+; ... leave other keys intact
+```
+
+#### Subdomain redirecting
+_Note: for complex URL forwarding consider using specialized solutions like [Nginx](https://nginx.org/) or [Apache HTTP Server](https://httpd.apache.org/)._
+
+In case you run app on a domain (e.g. `example.com`) and want to redirect there any request with inappropriate url like this:
+```
+http://www.example.com/
+http://any_subdomain.example.com/any/path
+http://example.com/any/unmatched/path
+```
+then provide `server_name` to `[domain]` section:
+```ini
+[domain]
+server_name = example.com:80
+subdomain =
+; ... leave other keys intact
+```
+In case you want to run app on a specific subdomain (e.g. `app.example.com`) and set redirection for urls like:
+```
+http://example.com/
+http://example.com/any/path
+http://app.example.com/any/unmatched/path
+http://any_other_subdomain.example.com/any/path
+```
+then additionally provide `subdomain`:
+```ini
+[domain]
+server_name = example.com:80
+subdomain = app
+; ... leave other keys intact
+```
+To test this feature locally append domain records to [`hosts` file](https://en.wikipedia.org/wiki/Hosts_(file)):
+```
+127.0.0.1 example.com
+127.0.0.1 app.example.com
+127.0.0.1 any_other_subdomain.example.com
 ```
 
 ## Run tests
