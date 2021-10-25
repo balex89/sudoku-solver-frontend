@@ -1,10 +1,11 @@
 html {
-    background-color: #e4e2e2;
+    background-color: #eeeeee;
     font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
     scrollbar-width: none;  /* Firefox issue */
+    overflow: hidden;
 }
 
 * {
@@ -109,6 +110,35 @@ body {
     transform-origin: top left;
 }
 
+#glyphs {
+    position: absolute;
+    left: 50vw;
+    top: 0;
+    opacity: 0.05;
+    transition: opacity 1s ease;
+}
+
+.glyph {
+    width: calc(600px * var(--scale));
+    height: calc(600px * var(--scale));
+    top: calc(147px * var(--scale));
+}
+
+#glyph-left {
+    position: absolute;
+    left: calc((-1 *  1.5 * 600px - 40px) * var(--scale));
+}
+
+#glyph-right {
+    position: absolute;
+    left: calc((0.5 * 600px + 40px) * var(--scale));
+}
+
+@media (max-aspect-ratio: 5/4) {
+    #glyphs {
+      opacity: 0;
+    }
+  }
 
 @media (min-width: 640px) and (min-height: 910px) {
         #content {
@@ -188,15 +218,15 @@ body {
 }
 
 .grid__row:nth-child(-3n+6) {
-    border-bottom: 3px solid black;
+    border-bottom: 4px solid black;
 }
 
 .grid__row:first-child {
-    border-top: 3px solid black;
+    border-top: 4px solid black;
 }
 
 .grid__row:last-child {
-    border-bottom: 3px solid black;
+    border-bottom: 4px solid black;
 }
 
 .grid__item {
@@ -205,15 +235,15 @@ body {
 }
 
 .grid__item:nth-child(-3n+6) {
-    border-right: 3px solid black;
+    border-right: 4px solid black;
 }
 
 .grid__item:first-child {
-    border-left: 3px solid black;
+    border-left: 4px solid black;
 }
 
 .grid__item:last-child {
-    border-right: 3px solid black;
+    border-right: 4px solid black;
 }
 
 .grid__input {
