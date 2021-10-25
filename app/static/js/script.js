@@ -1,7 +1,15 @@
-// Constants
+// CSS utils
 
-const CONTENT_WIDTH = 640;
-const CONTENT_HEIGHT = 910;
+function styleValueToNumber(string) {
+    return parseFloat(string.replace(/[^\d]+/g, ''));
+}
+
+// Calculate Constants
+
+content_style = getComputedStyle(document.getElementById("content"))
+
+const CONTENT_WIDTH = styleValueToNumber(content_style.getPropertyValue("--base-width"));
+const CONTENT_HEIGHT = styleValueToNumber(content_style.getPropertyValue("--base-height"));
 
 // Cell value converters
 
@@ -219,34 +227,14 @@ const resetPreviousValue = function (elem) {
 };
 
 
-// Content resizing
+function cacl_scale() {
+    document.getElementById("content").style.setProperty(
+        "--scale",
+        Math.min(window.innerWidth / CONTENT_WIDTH, window.innerHeight / CONTENT_HEIGHT, 1)
+    );
+} 
 
-function rescale_content() {
-
-    const content = document.getElementById("content");
-
-    const scale = Math.min(window.innerWidth / CONTENT_WIDTH, window.innerHeight / CONTENT_HEIGHT, 1);
-
-    setStyles(content, {
-        "transform": `scale(${scale})`,
-        "transform-origin": "top left"
-    });
-
-    if (scale == 1) {
-        content.style.removeProperty("width");
-        setStyles(content, {
-            "left": 0
-        });
-    } else {
-        setStyles(content, {
-            "width": CONTENT_WIDTH + "px",
-            "left": Math.max((window.innerWidth - CONTENT_WIDTH * scale) / 2, 0) + "px"
-        });
-    };
-
-}
-
-window.addEventListener("resize", rescale_content);
+window.addEventListener("resize", cacl_scale);
 
 
 // HTML Initalization
@@ -268,11 +256,12 @@ window.onload = function () {
         gridHtml += `</ul>`
     };
     document.getElementById("grid").innerHTML = gridHtml;
-    rescale_content();
 
     if (initialGrid) {
         fillGrid(initialGrid);
     };
+
+    cacl_scale();
 
     setStyles(document.getElementById("initial-foreground"), {
         "opacity": 0.0,

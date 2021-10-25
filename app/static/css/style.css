@@ -3,6 +3,10 @@ html {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+body {
+    scrollbar-width: none;  /* Firefox issue */
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -13,11 +17,12 @@ html {
     position: absolute;
     top: -50px;
     height: 50px;
-    width: 100%;
     background-color: #b93131;
     opacity: 0;
     display: flex;
     transition: top 1s ease;
+    left: calc(-1 * var(--left) / var(--scale));
+    width: calc(100vw / var(--scale));
 }
 
 #notify-bar__content {
@@ -90,20 +95,38 @@ html {
 }
 
 #content {
+    --base-width: 640px;
+    --base-height: 910px;
+    --left: calc(max((100vw - 640px * var(--scale)) / 2, 0px));
+    transform: scale(calc(var(--scale)));
+    left: calc(var(--left));
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    width: 640px;
+    height: 100%;
     transition: filter .5s;
     display: flex;
     flex-direction: column;
+    transform-origin: top left;
+}
+
+
+@media (min-width: 640px) and (min-height: 910px) {
+        #content {
+            justify-content: space-between;
+            width: 100%;
+            left: 0;
+        }
+        #notify-bar {
+            width: 100%;
+            left: 0;
+        }
 }
 
 #focus-content {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
 }
 
 .header {
@@ -122,7 +145,6 @@ html {
     margin: 0 auto;
     margin-top: 10px;
     text-align: center;
-    flex: 1;
     display: flex;
 }
 
@@ -144,8 +166,6 @@ html {
 
 #grid-and-menu {
     margin-top: 20px;
-    margin-left: auto;
-    margin-right: auto;
     width: 640px;
 }
 
