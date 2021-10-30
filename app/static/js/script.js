@@ -228,7 +228,7 @@ const resetPreviousValue = function (elem) {
 
 
 function cacl_scale() {
-    document.getElementById("content").style.setProperty(
+    document.body.style.setProperty(
         "--scale",
         Math.min(window.innerWidth / CONTENT_WIDTH, window.innerHeight / CONTENT_HEIGHT, 1)
     );
