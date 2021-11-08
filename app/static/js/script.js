@@ -75,9 +75,9 @@ function getStringifiedGrid() {
 
 function updateURLwithCode(code = null) {
     if (code) {
-        window.history.pushState({ 'code': code }, 'encoded', `/~${code}`);
+        window.history.pushState({ 'code': code }, '', `/~${code}`);
     } else {
-        window.history.pushState({ 'code': null }, 'base', `/`);
+        window.history.pushState({ 'code': null }, '', `/`);
     }
 }
 
@@ -113,12 +113,12 @@ function fillGrid(grid) {
 async function validateCell(cell) {
     const is_valid = await is_valid_grid();
     console.log(`is_valid=${is_valid}`);
-    if (is_valid === false){
-        setStyles(cell, {"color": "red", "font-weight": 600})
+    if (is_valid === false) {
+        setStyles(cell, { "color": "red", "font-weight": 600 })
     } else {
         Array.from(document.getElementsByClassName("grid__input")).forEach(element => {
             console.log(element);
-            setStyles(element, {"color": "black", "font-weight": 400})
+            setStyles(element, { "color": "black", "font-weight": 400 })
         });
     }
 }
@@ -194,7 +194,7 @@ const solve = longCall(async () => {
 })
 
 const is_valid_grid = async () => {
-    const response = await fetch('/validate?' + new URLSearchParams({"numbers": getStringifiedGrid()}));
+    const response = await fetch('/validate?' + new URLSearchParams({ "numbers": getStringifiedGrid() }));
     const content = await response.json();
     return content["is_valid"];
 };
@@ -232,7 +232,7 @@ function cacl_scale() {
         "--scale",
         Math.min(window.innerWidth / CONTENT_WIDTH, window.innerHeight / CONTENT_HEIGHT, 1)
     );
-} 
+}
 
 window.addEventListener("resize", cacl_scale);
 
