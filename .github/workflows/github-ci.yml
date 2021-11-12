@@ -48,7 +48,7 @@ jobs:
           python -m pytest -v
 
   docker-build:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master'}}
+    if: ${{ github.event_name == 'push' }}
 
     needs: test
 
@@ -76,7 +76,7 @@ jobs:
           tags: ${{ env.REPO }}:latest
 
   deploy:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master'}}
+    if: ${{ github.event_name == 'push' }}
     needs: docker-build
 
     runs-on: ubuntu-latest
