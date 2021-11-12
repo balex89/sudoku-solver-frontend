@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      CONFIG_FILE: app/sudokuFrontend.ini
+      CONFIG_MOUNT_PATH: /app/sudokuFrontend.ini
       REPO_NAME: sudoku-solver-frontend
 
     steps:
@@ -92,4 +92,5 @@ jobs:
             docker rm -f ${{ env.REPO_NAME }}
             docker pull ${{ env.REPO }}:latest
             docker run --name=${{ env.REPO_NAME }} -d -p 5001:5001 \
-              -v ${{ secrets.APP_CONFIG_FILE_PATH }}:${{ env.CONFIG_FILE }} ${{ env.REPO }}:latest
+              -v ${{ secrets.APP_CONFIG_FILE_PATH }}:${{ env.CONFIG_MOUNT_PATH }} \
+              ${{ env.REPO }}:latest
