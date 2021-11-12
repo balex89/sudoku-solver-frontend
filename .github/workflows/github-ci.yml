@@ -1,29 +1,95 @@
 name: GitHub CI
 
 on: [push, pull_request]
-  
+
+env:
+  REPO: kalinbob/sudoku-solver-frontend
+
 jobs:
-  test:
+
+  check-pep8:
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install flake8
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings.
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
-    - name: Test with pytest
-      run: |
-        python -m pytest -v
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+      - name: Lint with flake8
+        run: |
+          # stop the build if any pep8 rule violated (except complexity)
+          flake8 . --count --ignore=C901 --show-source --max-line-length=100 --statistics
+          # exit-zero treats all errors as warnings.
+          flake8 . --count --select=C901 --exit-zero --max-complexity=10 --statistics
+
+  test:
+    needs: check-pep8
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Test with pytest
+        run: |
+          python -m pytest -v
+
+  docker-build:
+    if: ${{ github.event_name == 'push' }}
+
+    needs: test
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - run: |
+          sed -i 's/.*/&-SNAPSHOT-${{ github.sha }}/' app/version.txt
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REPO }}:latest
+
+  deploy:
+    if: ${{ github.event_name == 'push' }}
+    needs: docker-build
+
+    runs-on: ubuntu-latest
+
+    env:
+      CONFIG_FILE: app/sudokuFrontend.ini
+      REPO_NAME: sudoku-solver-frontend
+
+    steps:
+      - name: Docker pull and run
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.VM_KEY }}
+          script: |
+            docker rm -f $REPO_NAME
+            docker pull $REPO:latest
+            docker run --name=$REPO_NAME -d -p 5001:5001 \
+              -v ${{ secret.APP_CONFIG_FILE_PATH }}:$CONFIG_FILE $REPO:latest

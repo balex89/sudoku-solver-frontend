@@ -38,7 +38,7 @@ def sudoku(code=None):
         logger.exception('Invalid code string to decode: '
                          '"%s". Caused: %s. Redirecting to "/".', code, type(e).__name__)
         return redirect("/")
-    return render_template("index.html.j2", grid=grid, version=config["app"]["version"])
+    return render_template("index.html.j2", grid=grid, version=app.config["VERSION"])
 
 
 @app.route("/favicon.ico", subdomain=SUBDOMAIN)
