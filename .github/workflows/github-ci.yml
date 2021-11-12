@@ -92,4 +92,4 @@ jobs:
             docker rm -f $REPO_NAME
             docker pull $REPO:latest
             docker run --name=$REPO_NAME -d -p 5001:5001 \
-              -v ${{ secret.APP_CONFIG_FILE_PATH }}:$CONFIG_FILE $REPO:latest
+              -v ${{ secrets.APP_CONFIG_FILE_PATH }}:$CONFIG_FILE $REPO:latest
