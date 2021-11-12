@@ -48,7 +48,7 @@ jobs:
           python -m pytest -v
 
   docker-build:
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master'}}
 
     needs: test
 
@@ -76,7 +76,7 @@ jobs:
           tags: ${{ env.REPO }}:latest
 
   deploy:
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master'}}
     needs: docker-build
 
     runs-on: ubuntu-latest
@@ -95,6 +95,6 @@ jobs:
           script: |
             docker rm -f ${{ env.REPO_NAME }}
             docker pull ${{ env.REPO }}:latest
-            docker run --name=${{ env.REPO_NAME }} -d -p 5001:5001 \
+            docker run --name=${{ env.REPO_NAME }} -d -p 80:5001 \
               -v ${{ secrets.APP_CONFIG_FILE_PATH }}:${{ env.CONFIG_MOUNT_PATH }} \
               ${{ env.REPO }}:latest
