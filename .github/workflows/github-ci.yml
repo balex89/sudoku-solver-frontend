@@ -89,7 +89,7 @@ jobs:
           username: ${{ secrets.VM_USERNAME }}
           key: ${{ secrets.VM_KEY }}
           script: |
-            docker rm -f $REPO_NAME
-            docker pull $REPO:latest
-            docker run --name=$REPO_NAME -d -p 5001:5001 \
-              -v ${{ secrets.APP_CONFIG_FILE_PATH }}:$CONFIG_FILE $REPO:latest
+            docker rm -f ${{ env.REPO_NAME }}
+            docker pull ${{ env.REPO }}:latest
+            docker run --name=${{ env.REPO_NAME }} -d -p 5001:5001 \
+              -v ${{ secrets.APP_CONFIG_FILE_PATH }}:${{ env.CONFIG_FILE }} ${{ env.REPO }}:latest
