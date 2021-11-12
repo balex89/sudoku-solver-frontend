@@ -103,7 +103,8 @@ class Grid(list):
         tail = len(bin_code) % 6
         if tail:
             bin_code += '0' * (6 - tail)
-        return ''.join(cls.B64[int(bin_code[i * 6:(i + 1) * 6], 2)] for i in range(len(bin_code) // 6))
+        return ''.join(cls.B64[int(bin_code[i * 6:(i + 1) * 6], 2)]
+                       for i in range(len(bin_code) // 6))
 
     @classmethod
     def b64_to_bin(cls, string):
