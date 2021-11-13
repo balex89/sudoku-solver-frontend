@@ -90,7 +90,7 @@ jobs:
 
     steps:
       - name: Docker pull and run
-        uses: appleboy/ssh-action@v0.1
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USERNAME }}
