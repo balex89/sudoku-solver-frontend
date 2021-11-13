@@ -48,7 +48,7 @@ jobs:
           python -m pytest -v
 
   docker-build:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    if: ${{ github.event_name == 'push' }}
 
     needs: test
 
@@ -76,18 +76,21 @@ jobs:
           tags: ${{ env.REPO }}:latest
 
   deploy:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    if: ${{ github.event_name == 'push' }}
     needs: docker-build
 
     runs-on: ubuntu-latest
 
     env:
-      CONFIG_MOUNT_PATH: /app/sudokuFrontend.ini
       REPO_NAME: sudoku-solver-frontend
+      CONFIG_MOUNT_PATH: /app/sudokuFrontend.ini
+      HOST_COFIG_PATH: /kalinbob/config/sudokuFrontend.ini
+      LOG_MOUNT_PATH: /app/logs
+      HOST_LOG_PATH: /kalinbob/logs
 
     steps:
       - name: Docker pull and run
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USERNAME }}
@@ -96,5 +99,6 @@ jobs:
             docker rm -f ${{ env.REPO_NAME }}
             docker pull ${{ env.REPO }}:latest
             docker run --name=${{ env.REPO_NAME }} -d -p 80:5001 \
-              -v ${{ secrets.APP_CONFIG_FILE_PATH }}:${{ env.CONFIG_MOUNT_PATH }} \
+              -v ${{ env.HOST_COFIG_PATH }}:${{ env.CONFIG_MOUNT_PATH }}:ro \
+              -v ${{ env.HOST_LOG_PATH }}:${{ env.LOG_MOUNT_PATH }} \
               ${{ env.REPO }}:latest
