@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      REPO_NAME: sudoku-solver-frontend
+      APP_NAME: sudoku-solver-frontend
       CONFIG_MOUNT_PATH: /app/sudokuFrontend.ini
       HOST_COFIG_PATH: /kalinbob/config/sudokuFrontend.ini
       LOG_MOUNT_PATH: /app/logs
@@ -96,9 +96,9 @@ jobs:
           username: ${{ secrets.VM_USERNAME }}
           key: ${{ secrets.VM_KEY }}
           script: |
-            docker rm -f ${{ env.REPO_NAME }}
+            docker rm -f ${{ env.APP_NAME }}
             docker pull ${{ env.REPO }}:latest
-            docker run --name=${{ env.REPO_NAME }} -d -p 80:5001 \
+            docker run --name=${{ env.APP_NAME }} -d -p 80:5001 \
               -v ${{ env.HOST_COFIG_PATH }}:${{ env.CONFIG_MOUNT_PATH }}:ro \
-              -v ${{ env.HOST_LOG_PATH }}:${{ env.LOG_MOUNT_PATH }} \
+              -v ${{ env.HOST_LOG_PATH }}/${{ env.APP_NAME }}:${{ env.LOG_MOUNT_PATH }} \
               ${{ env.REPO }}:latest
