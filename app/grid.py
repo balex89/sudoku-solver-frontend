@@ -103,7 +103,8 @@ class Grid(list):
         tail = len(bin_code) % 6
         if tail:
             bin_code += '0' * (6 - tail)
-        return ''.join(cls.B64[int(bin_code[i*6:(i+1)*6], 2)] for i in range(len(bin_code) // 6))
+        return ''.join(cls.B64[int(bin_code[i * 6:(i + 1) * 6], 2)]
+                       for i in range(len(bin_code) // 6))
 
     @classmethod
     def b64_to_bin(cls, string):
@@ -220,7 +221,7 @@ class Grid(list):
         return self.bin_to_b64(code)
 
     @classmethod
-    def decode_3(cls, string=None, *,  bin_code=None):
+    def decode_3(cls, string=None, *, bin_code=None):
         """ The decoder for encode_3(). Returns list of list of values (or Nones) """
         if bin_code is None:
             bin_code = cls.b64_to_bin(string)
