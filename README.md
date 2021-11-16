@@ -13,18 +13,31 @@ Featuring immediate URL-safe [grid encoding](#sudoku-grid-encoding).
 </p>
 
 ## Prerequisites
+- [Docker 20.10+](https://docs.docker.com/engine/install/) (_for amd64 linux platform only_)
+
+or 
+
 - [Python 3.9 +](https://www.python.org/downloads/)
 - [pip](https://pip.pypa.io/en/stable/)
 
-## Setup
+## Docker setup and run
+Pull the latest build available:
+```shell
+docker pull kalinbob/sudoku-solver-frontend:latest
+```
+Or one of stable [release versions awailable](https://hub.docker.com/repository/docker/kalinbob/sudoku-solver-frontend) (see [release notes](https://github.com/balex89/sudoku-solver/releases) for details).
 
-### Install dependencies:
-```commandline
-pip install -r requirements.txt
+Run pulled `<VERSION>` on `<PORT>` of your choice. Provide [`<CONFIG>`](#configuration) file path:
+```shell
+docker run --name=sudoku-solver -d -p <PORT>:5001 -v <CONFIG>:/app/sudokuFrontend.ini:ro kalinbob/sudoku-solver-frontend:<VERSION>
+```
+Add this option for writing logs to`<DIRECTORY>` on the host:
+```shell
+-v <DIRECTORY>:/app/logs
 ```
 
 ### Configuration:
-Config file `sudokuFrontend.ini` provides some customization options:
+Config file [`app/sudokuFrontend.ini`](app/sudokuFrontend.ini) provides some customization options:
 
 #### Solver service socket
 Is specified in `[solverService]` section. E.g. to run on the same host:
@@ -34,7 +47,7 @@ host = localhost
 port = 5000
 ; ... leave other keys intact
 ```
-
+_**Note when using Docker**: container by default treats `localhost` as itself, **not** the Docker host. Consider using [`--network host` option](https://docs.docker.com/network/network-tutorial-host/) or other ways of refering to host._
 #### Subdomain redirecting
 _Note: for complex URL forwarding consider using specialized solutions like [Nginx](https://nginx.org/) or [Apache HTTP Server](https://httpd.apache.org/)._
 
@@ -72,14 +85,21 @@ To test this feature locally append domain records to [`hosts` file](https://en.
 127.0.0.1 any_other_subdomain.example.com
 ```
 
-## Run tests
-```commandline
+## Classic setup, test and run
+
+### Install dependencies:
+```shell
+pip install -r requirements.txt
+```
+
+### Run tests
+```shell
 python -m pytest -v
 ```
 
-## Run web-server
+### Run web-server
 On Windows (e.g. on port 5001):
-```
+```shell
 set FLASK_APP=app.main
 python -m flask run -h 0.0.0.0 -p 5001
 ```
