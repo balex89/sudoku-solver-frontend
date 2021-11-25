@@ -47,7 +47,7 @@ host = localhost
 port = 5000
 ; ... leave other keys intact
 ```
-_**Note when using Docker**: container by default treats `localhost` as itself, **not** the Docker host. Consider using [`--network host` option](https://docs.docker.com/network/network-tutorial-host/) or other ways of refering to host._
+_**Note when using Docker**: container by default treats `localhost` as itself, **not** the Docker host. Consider using [`--network host` option](https://docs.docker.com/network/network-tutorial-host/) or other ways of referring to host._
 #### Subdomain redirecting
 _Note: for complex URL forwarding consider using specialized solutions like [Nginx](https://nginx.org/) or [Apache HTTP Server](https://httpd.apache.org/)._
 
