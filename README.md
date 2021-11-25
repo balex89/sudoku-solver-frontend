@@ -25,7 +25,7 @@ Pull the latest build available:
 ```shell
 docker pull kalinbob/sudoku-solver-frontend:latest
 ```
-Or one of stable [release versions awailable](https://hub.docker.com/repository/docker/kalinbob/sudoku-solver-frontend) (see [release notes](https://github.com/balex89/sudoku-solver/releases) for details).
+Or one of stable [release versions available](https://hub.docker.com/repository/docker/kalinbob/sudoku-solver-frontend) (see [release notes](https://github.com/balex89/sudoku-solver/releases) for details).
 
 Run pulled `<VERSION>` on `<PORT>` of your choice. Provide [`<CONFIG>`](#configuration) file path:
 ```shell
