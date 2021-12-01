@@ -1,4 +1,4 @@
-name: Release publish GitHub CI
+name: GitHub Release publish workflow
 
 env:
   REPO: kalinbob/sudoku-solver-frontend

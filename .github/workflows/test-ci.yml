@@ -1,0 +1,49 @@
+name: GitHub test workflow
+
+on:
+  push:
+    branches-ignore:
+      - master
+  pull_request:
+
+jobs:
+
+  check-pep8:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+      - name: Lint with flake8
+        run: |
+          # stop the build if any pep8 rule violated (except complexity)
+          flake8 . --count --ignore=C901 --show-source --max-line-length=100 --statistics
+          # exit-zero treats all errors as warnings.
+          flake8 . --count --select=C901 --exit-zero --max-complexity=10 --statistics
+
+  test:
+    needs: check-pep8
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Test with pytest
+        run: |
+          python -m pytest -v
