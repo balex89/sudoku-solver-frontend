@@ -74,7 +74,7 @@ def get_task():
 
     resp = requests.request(
         method="GET",
-        url=SOLVER_API_URL + "/v1/get_task",
+        url=SOLVER_API_URL + "/get_task",
         headers=request.headers,
     )
     return Response(resp.content, resp.status_code, resp.raw.headers.items())
