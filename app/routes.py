@@ -69,6 +69,17 @@ def solve():
     return Response(resp.content, resp.status_code, resp.raw.headers.items())
 
 
+@app.route("/get_task", methods=["GET"], subdomain=SUBDOMAIN)
+def get_task():
+
+    resp = requests.request(
+        method="GET",
+        url=SOLVER_API_URL + "/get_task",
+        headers=request.headers,
+    )
+    return Response(resp.content, resp.status_code, resp.raw.headers.items())
+
+
 @app.route("/encode", methods=["GET"], subdomain=SUBDOMAIN)
 def encode():
     numbers = request.args["numbers"]
