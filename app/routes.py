@@ -83,7 +83,7 @@ def get_task():
 @app.route("/encode", methods=["GET"], subdomain=SUBDOMAIN)
 def encode():
     numbers = request.args["numbers"]
-    return Grid.from_str(numbers).encode()
+    return jsonify(status="ok", code=Grid.from_str(numbers).encode())
 
 
 @app.route("/validate", methods=["GET"], subdomain=SUBDOMAIN)
