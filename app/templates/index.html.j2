@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui, user-scalable=no">
     <title>Sudoku Solver</title>
     <link rel="stylesheet" href={{url_for("get_static", filename="css/style.css")}}>
     <link rel="stylesheet" href={{url_for("get_static", filename="css/normalize.css" )}}>
@@ -19,10 +19,6 @@
 </head>
 
 <body>
-    <div id="glyphs">
-        <object class="glyph" id="glyph-left" type="image/svg+xml" data={{url_for("get_static", filename="img/glyph-left.svg")}}></object>
-        <object class="glyph" id="glyph-right" type="image/svg+xml" data={{url_for("get_static", filename="img/glyph-right.svg")}}></object>
-    </div>
     <div id="content">
         <div id="focus-content">
             <h1 class="header">SUDOKU SOLVER</h1>
@@ -31,8 +27,17 @@
                     <ul id="grid"></ul>
                 </div>
                 <div class="menu-section">
-                    <button class="btn" onclick="solve()">SOLVE</button>
-                    <button class="btn" onclick="clearGrid()">CLEAR</button>
+                    <button class="btn btn-main-menu" id="btn-generate" onclick="">GENERATE</button>
+                    <button class="btn btn-main-menu" onclick="solve()">SOLVE</button>
+                    <button class="btn btn-main-menu" onclick="clearGrid()">CLEAR</button>
+                    <button class="btn btn-main-menu btn-square" id="btn-revert" onclick="revertGrid()">
+                        <img id="svg-revert" src={{url_for("get_static", filename="img/corner-up-left.svg")}}>
+                    </button>
+                    <div id="gen-menu">
+                        <button class="btn menu__item" disabled>EASY</button>
+                        <button class="btn menu__item" disabled>MEDIUM</button>
+                        <button class="btn menu__item" onclick="generate()">HARD</button>
+                    </div>
                 </div>
             </section>
         </div>
@@ -43,6 +48,10 @@
                 <small>{{version}}</small>
             </div>
         </footer>
+        <div id="glyphs">
+            <object class="glyph" id="glyph-left" type="image/svg+xml" data={{url_for("get_static", filename="img/glyph-left.svg")}}></object>
+            <object class="glyph" id="glyph-right" type="image/svg+xml" data={{url_for("get_static", filename="img/glyph-right.svg")}}></object>
+        </div>
         <div id="notify-bar">
             <div id="notify-bar__content">
                 <small id="notification"></small>

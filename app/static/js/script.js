@@ -4,13 +4,6 @@ function styleValueToNumber(string) {
     return parseFloat(string.replace(/[^\d]+/g, ''));
 }
 
-// Calculate Constants
-
-content_style = getComputedStyle(document.getElementById("content"))
-
-const CONTENT_WIDTH = styleValueToNumber(content_style.getPropertyValue("--base-width"));
-const CONTENT_HEIGHT = styleValueToNumber(content_style.getPropertyValue("--base-height"));
-
 // Cell value converters
 
 function toCellValue(s) {
@@ -56,6 +49,39 @@ function hideNotification() {
 
 // Grid manipulation utils
 
+const grid_history = {
+    _hist: [],
+    push: function (grid) {
+        if (this._hist.length == 0 || !equalGrid(grid, this._hist[this._hist.length - 1])) {
+            this._hist.push(grid);
+            document.getElementById("btn-revert").disabled = (this._hist.length < 2);
+        }
+    },
+    pop: function () {
+        if (this._hist.length >= 2) {
+            this._hist.pop();
+            if (this._hist.length < 2) {
+                document.getElementById("btn-revert").disabled = true;
+            };
+            return this._hist.pop();
+        };
+        return null;
+    },
+    empty: function () {
+        this._hist = [];
+    }
+}
+
+function getEmptyGrid() {
+    return Array.from(
+        Array(9).keys(),
+        i => Array.from(
+            Array(9).keys(),
+            j => null
+        )
+    );
+}
+
 function getGrid() {
     return Array.from(
         Array(9).keys(),
@@ -73,6 +99,15 @@ function getStringifiedGrid() {
     ).join('');
 }
 
+function equalGrid(grid_1, grid_2) {
+    for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+            if (grid_1[i][j] != grid_2[i][j]) return false;
+        }
+    };
+    return true;
+}
+
 function updateURLwithCode(code = null) {
     if (code) {
         window.history.pushState({ 'code': code }, '', `/~${code}`);
@@ -82,6 +117,7 @@ function updateURLwithCode(code = null) {
 }
 
 async function encode_grid() {
+    grid_history.push(getGrid());
     string = getStringifiedGrid()
     let code = null
     if (Array.from(new Set(string)).join('') != '0') {
@@ -91,13 +127,20 @@ async function encode_grid() {
     updateURLwithCode(code);
 }
 
+function revertGrid() {
+    let grid = grid_history.pop();
+    if (grid != null) {
+        fillGrid(grid);
+    };
+}
+
 function clearGrid() {
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
             document.getElementById(`Cell(${i},${j})`).value = "";
         }
     }
-    updateURLwithCode(null);
+    encode_grid();
 }
 
 function fillGrid(grid) {
@@ -112,12 +155,10 @@ function fillGrid(grid) {
 
 async function validateCell(cell) {
     const is_valid = await is_valid_grid();
-    console.log(`is_valid=${is_valid}`);
     if (is_valid === false) {
         setStyles(cell, { "color": "red", "font-weight": 600 })
     } else {
         Array.from(document.getElementsByClassName("grid__input")).forEach(element => {
-            console.log(element);
             setStyles(element, { "color": "black", "font-weight": 400 })
         });
     }
@@ -126,12 +167,12 @@ async function validateCell(cell) {
 
 // Screen holding
 
-function playAnimation() {
-    a = document.getElementById("animated-svg");
-    b = a.contentDocument;
-    c = b.getElementById("e6flsqoxhzzs1");
-    c.dispatchEvent(new Event("click"));
-}
+//function playAnimation() {
+//    a = document.getElementById("animated-svg");
+//    b = a.contentDocument;
+//    c = b.getElementById("e6flsqoxhzzs1");
+//    c.dispatchEvent(new Event("click"));
+//}
 
 function holdScreen() {
     setStyles(document.getElementById("foreground"), {
@@ -193,12 +234,79 @@ const solve = longCall(async () => {
     };
 })
 
+const generate = longCall(async () => {
+    const response = await fetch('/get_task', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    });
+    const content = await response.json();
+
+    switch (content["status"]) {
+        case "ok":
+            grid_history.empty();
+            fillGrid(content["grid"]);
+            break;
+        case "error":
+            notify(`Error: ${content["error"]}`);
+            break;
+        default:
+            notify("Something went wrong")
+    };
+})
+
 const is_valid_grid = async () => {
     const response = await fetch('/validate?' + new URLSearchParams({ "numbers": getStringifiedGrid() }));
     const content = await response.json();
     return content["is_valid"];
 };
 
+
+// Generate menu logic
+
+const btn_generate_style = getComputedStyle(document.getElementById("btn-generate"));
+
+function showGenMenu() {
+    btn_menu = document.getElementById("gen-menu");
+    btn_generate = document.getElementById("btn-generate")
+    btn_menu_rect = btn_menu.getBoundingClientRect();
+    btn_generate_rect = btn_generate.getBoundingClientRect();;
+
+    setStyles(btn_menu, {
+        visibility: "visible",
+        top: btn_generate_rect.y - btn_menu_rect.height + "px",
+        left: btn_generate_rect.x + "px",
+        width: btn_generate_rect.width + "px"
+    });
+
+    setStyles(btn_generate, {
+        "background-color": btn_generate_style.getPropertyValue("--btn-background-active"),
+        "color": btn_generate_style.getPropertyValue("--btn-color-active")
+    });
+}
+
+function hideGenMenu() {
+    setStyles(document.getElementById("gen-menu"), {
+        visibility: "hidden"
+    });
+    setStyles(document.getElementById("btn-generate"), {
+        "background-color": btn_generate_style.getPropertyValue("--btn-background"),
+        "color": btn_generate_style.getPropertyValue("--btn-color")
+    });
+}
+
+window.addEventListener('click', function (e) {
+    if (document.getElementById("gen-menu").style.visibility == "visible") {
+        hideGenMenu()
+    } else if (e.target.id == "btn-generate") {
+        showGenMenu()
+    }
+});
+
+window.addEventListener("resize", function () {
+    hideGenMenu();
+});
 
 // Grid cells value input
 
@@ -211,7 +319,7 @@ document.onkeydown = (e) => {
     if (elem.className == "grid__input") {
         if (cellSetKeys.has(e.key)) {
             elem.value = e.key;
-            validateCell(elem);
+            // validateCell(elem);
         } else if (cellClearKeys.has(e.key)) {
             elem.value = "";
         } else {
@@ -225,16 +333,6 @@ document.onkeydown = (e) => {
 const resetPreviousValue = function (elem) {
     elem.value = previousCellValues[elem.id] || "";
 };
-
-
-function cacl_scale() {
-    document.body.style.setProperty(
-        "--scale",
-        Math.min(window.innerWidth / CONTENT_WIDTH, window.innerHeight / CONTENT_HEIGHT, 1)
-    );
-}
-
-window.addEventListener("resize", cacl_scale);
 
 
 // HTML Initalization
@@ -257,11 +355,7 @@ window.onload = function () {
     };
     document.getElementById("grid").innerHTML = gridHtml;
 
-    if (initialGrid) {
-        fillGrid(initialGrid);
-    };
-
-    cacl_scale();
+    fillGrid(initialGrid ? initialGrid : getEmptyGrid());
 
     setStyles(document.getElementById("initial-foreground"), {
         "opacity": 0.0,
