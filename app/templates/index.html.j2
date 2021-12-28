@@ -33,10 +33,12 @@
                     <button class="btn btn-main-menu btn-square" id="btn-revert" onclick="revertGrid()">
                         <img id="svg-revert" src={{url_for("get_static", filename="img/corner-up-left.svg")}}>
                     </button>
-                    <div id="gen-menu">
-                        <button class="btn menu__item" disabled>EASY</button>
-                        <button class="btn menu__item" disabled>MEDIUM</button>
-                        <button class="btn menu__item" onclick="generate()">HARD</button>
+                    <div id="gen-menu-container">
+                        <div id="gen-menu" class="dropdown-menu">
+                            <button class="btn menu__item" disabled>EASY</button>
+                            <button class="btn menu__item" disabled>MEDIUM</button>
+                            <button class="btn menu__item" onclick="generate()">HARD</button>
+                        </div>
                     </div>
                 </div>
             </section>

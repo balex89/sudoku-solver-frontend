@@ -26,11 +26,13 @@
 
 html {
     background-color: var(--background);
-    font-family: Bruno Ace Regular;  /*Arial, Helvetica, sans-serif; */
+    font-family: Bruno Ace Regular;
+    /*Arial, Helvetica, sans-serif; */
 }
 
 body {
-    scrollbar-width: none; /* Firefox issue */
+    scrollbar-width: none;
+    /* Firefox issue */
 }
 
 * {
@@ -286,15 +288,19 @@ body {
     user-select: none;
 }
 
-.btn:first-child {
-    margin-left: 0px;
-}
-
 .btn-main-menu {
     border: 2px solid #600303;
     border-radius: 10px;
-    margin-left: 5px;
     transition: 0.1s;
+}
+
+.btn-main-menu:not(:first-child) {
+    margin-left: 5px;
+}
+
+.btn-main-menu--toggled {
+    background-color: var(--btn-background-active);
+    color: var(--btn-color-active);
 }
 
 .btn-square {
@@ -338,14 +344,27 @@ body {
     border: 0;
 }
 
-#gen-menu {
+#gen-menu-container {
     position: absolute;
     top: 0;
     left: 0;
+    visibility: hidden;
+    overflow: hidden;
+}
+
+.dropdown-menu {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    visibility: hidden;
+    width: 100%;
+    top: 100%;
+    transition: 0s;
+}
+
+.dropdown-menu--unfolded {
+    top: 0;
+    transition: 0.5s;
 }
 
 #gen-menu>.menu__item {
@@ -373,7 +392,7 @@ body {
         --font-size: 13px;
         --btn-height: 42.25px;
     }
-    .btn {
+    .btn-main-menu {
         margin-left: 3px;
     }
     #grid {
@@ -390,7 +409,7 @@ screen and (max-height: 595px) {
         --font-size: 10px;
         --btn-height: 31px;
     }
-    .btn {
+    .btn-main-menu {
         margin-left: 2px;
     }
     #grid {

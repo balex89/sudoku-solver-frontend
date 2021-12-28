@@ -21,6 +21,8 @@ function fromCellValue(v) {
 
 // Style uitls
 
+const $ = (str) => document.getElementById(str);
+
 function setStyles(element, styles) {
     Object.assign(element.style, styles);
 }
@@ -265,43 +267,41 @@ const is_valid_grid = async () => {
 
 // Generate menu logic
 
-const btn_generate_style = getComputedStyle(document.getElementById("btn-generate"));
-
 function showGenMenu() {
-    btn_menu = document.getElementById("gen-menu");
-    btn_generate = document.getElementById("btn-generate")
-    btn_menu_rect = btn_menu.getBoundingClientRect();
-    btn_generate_rect = btn_generate.getBoundingClientRect();;
 
-    setStyles(btn_menu, {
+    btn_menu_rect = $("gen-menu").getBoundingClientRect();
+    btn_generate_rect = $("btn-generate").getBoundingClientRect();
+
+    setStyles($("gen-menu-container"), {
         visibility: "visible",
-        top: btn_generate_rect.y - btn_menu_rect.height + "px",
-        left: btn_generate_rect.x + "px",
-        width: btn_generate_rect.width + "px"
+        top: btn_generate_rect.top - btn_menu_rect.height + "px",
+        left: btn_generate_rect.left + "px",
+        width: btn_generate_rect.width + "px",
+        height: btn_menu_rect.height + "px"
     });
 
-    setStyles(btn_generate, {
-        "background-color": btn_generate_style.getPropertyValue("--btn-background-active"),
-        "color": btn_generate_style.getPropertyValue("--btn-color-active")
-    });
+    $("gen-menu").classList.add("dropdown-menu--unfolded");
+    $("btn-generate").classList.add("btn-main-menu--toggled");
+
 }
 
 function hideGenMenu() {
-    setStyles(document.getElementById("gen-menu"), {
+
+    setStyles($("gen-menu-container"), {
         visibility: "hidden"
     });
-    setStyles(document.getElementById("btn-generate"), {
-        "background-color": btn_generate_style.getPropertyValue("--btn-background"),
-        "color": btn_generate_style.getPropertyValue("--btn-color")
-    });
+
+    $("gen-menu").classList.remove("dropdown-menu--unfolded");
+    $("btn-generate").classList.remove("btn-main-menu--toggled");
+
 }
 
 window.addEventListener('click', function (e) {
-    if (document.getElementById("gen-menu").style.visibility == "visible") {
-        hideGenMenu()
+    if ($("gen-menu-container").style.visibility == "visible") {
+        hideGenMenu();
     } else if (e.target.id == "btn-generate") {
-        showGenMenu()
-    }
+        showGenMenu();
+    };
 });
 
 window.addEventListener("resize", function () {
@@ -362,22 +362,3 @@ window.onload = function () {
         "pointer-events": "none"
     })
 }
-
-
-// Test utils
-
-function test() {
-    fillGrid(
-        [
-            [8, null, null, null, null, null, null, null, null],
-            [null, null, 3, 6, null, null, null, null, null],
-            [null, 7, null, null, 9, null, 2, null, null],
-            [null, 5, null, null, null, 7, null, null, null],
-            [null, null, null, null, 4, 5, 7, null, null],
-            [null, null, null, 1, null, null, null, 3, null],
-            [null, null, 1, null, null, null, null, 6, 8],
-            [null, null, 8, 5, null, null, null, 1, null],
-            [null, 9, null, null, null, null, 4, null, null]
-        ]
-    )
-};
