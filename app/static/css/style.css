@@ -20,7 +20,7 @@
     --btn-color-active: #b93131;
     --btn-disabled-color: #D6D6D6;
     --btn-font-family: Bruno Ace Regular;
-    --btn-shadow: 0px 4px 4px rgba(133, 116, 116, 0.25);
+    --btn-shadow: 0px 4px 4px rgba(133, 116, 116, 0.75);
     --menu-item-scale: 0.66;
 }
 
