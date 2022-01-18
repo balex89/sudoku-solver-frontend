@@ -328,20 +328,25 @@ body {
 
 .btn-square:active:enabled>#svg-revert {
     width: calc(var(--btn-height) * 0.4);
-    filter: invert(23%) sepia(78%) saturate(3454%) hue-rotate(349deg) brightness(79%) contrast(77%);
+    /* filter: invert(23%) sepia(78%) saturate(3454%) hue-rotate(349deg) brightness(79%) contrast(77%); */
+}
+
+.btn-square:disabled>#svg-revert {
+    filter: invert(0%) sepia(0%) saturate(19%) hue-rotate(198deg) brightness(102%) contrast(16%);
 }
 
 .btn:active:enabled {
-    background-color: var(--btn-background-active) !important;
+    /* background-color: var(--btn-background-active) !important; */
     font-size: calc(var(--font-size) * 0.8);
-    color: var(--btn-color-active) !important;
+    /* color: var(--btn-color-active) !important; */
     text-shadow: none;
 }
 
 .btn:disabled {
     background-color: var(--btn-disabled-color);
     text-shadow: none;
-    border: 0;
+    border: 2px solid #666666;
+    color: #ADADAD;
 }
 
 #gen-menu-container {
