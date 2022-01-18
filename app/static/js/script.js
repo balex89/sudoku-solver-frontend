@@ -1,8 +1,36 @@
 // CSS utils
 
 function styleValueToNumber(string) {
-    return parseFloat(string.replace(/[^\d]+/g, ''));
+    return parseFloat(string.replace(/[^.\d-]+/g, ''));
 }
+
+async function waitStyle(elem, property) {
+    /* Wait for the actual style property to hit css value (return true)
+       if the latest does not change (return false) */
+    target_value = () => styleValueToNumber(elem.style[property]);
+    initial_target_value = target_value();
+    value = () => styleValueToNumber(getComputedStyle(elem).getPropertyValue(property));
+    while (true) {
+        if (value() == initial_target_value) return true;
+        if (target_value() != initial_target_value) return false;
+        await new Promise(resolve => {
+            setTimeout(resolve, 50);
+        });
+    }
+}
+
+
+// Calculate Constants
+
+content_style = getComputedStyle(document.getElementById("content"))
+
+const CONTENT_WIDTH = styleValueToNumber(content_style.getPropertyValue("--base-width"));
+const CONTENT_HEIGHT = styleValueToNumber(content_style.getPropertyValue("--base-height"));
+
+const BACKGROUND_BLUR = 3;
+
+const ZERROS_STRING = '0'.repeat(81)
+
 
 // Cell value converters
 
@@ -30,23 +58,38 @@ function setStyles(element, styles) {
 
 // Notification utils
 
-function notify(text) {
-    document.getElementById("notification").textContent = text;
-    document.getElementById("notify-bar__content").setAttribute('title', text);
-    const bar = document.getElementById("notify-bar")
-    setStyles(bar, {
-        opacity: 1.0,
-        top: 0
-    })
-}
+const banner = {
+    _text: null,
 
-function hideNotification() {
-    const bar = document.getElementById("notify-bar");
-    setStyles(bar, {
-        opacity: 0.0,
-        top: -bar.offsetHeight + "px"
-    })
-}
+    async show(text) {
+        this._text = text;
+
+        if (!(await this.hide())) return;
+
+        document.getElementById("notification").textContent = this._text;
+        document.getElementById("notify-bar__content").setAttribute('title', this._text);
+        const bar = document.getElementById("notify-bar");
+        setStyles(bar, {
+            opacity: 1.0,
+            top: 0,
+            transition: "top 1s ease"
+        });
+    },
+
+    async showError(text) {
+        await this.show("Error: " + text);
+    },
+
+    async hide() {
+        const bar = document.getElementById("notify-bar");
+        setStyles(bar, {
+            transition: "top 0.3s",
+            top: -bar.offsetHeight - BACKGROUND_BLUR - 1 + "px"
+        });
+
+        return await waitStyle(bar, "top");
+    }
+};
 
 
 // Grid manipulation utils
@@ -122,11 +165,24 @@ async function encode_grid() {
     grid_history.push(getGrid());
     string = getStringifiedGrid()
     let code = null
-    if (Array.from(new Set(string)).join('') != '0') {
+    if (string != ZERROS_STRING) {
+
         const response = await fetch(`/encode?numbers=${string}`);
-        code = await response.text();
+        const content = await response.json();
+
+        switch (content["status"]) {
+            case "ok":
+                updateURLwithCode(content["code"]);
+                break;
+            case "error":
+                banner.showError(`${content["error"]}`);
+                break;
+            default:
+                banner.show("Something went wrong")
+        };
+    } else {
+        updateURLwithCode(null);
     }
-    updateURLwithCode(code);
 }
 
 function revertGrid() {
@@ -174,7 +230,7 @@ function holdScreen() {
         "opacity": 1.0,
         "pointer-events": "auto"
     })
-    document.getElementById("content").style["filter"] = "blur(3px) grayscale(35%)"
+    document.getElementById("content").style["filter"] = `blur(${BACKGROUND_BLUR}px) grayscale(35%)`
 }
 
 function unHoldScreen() {
@@ -191,7 +247,7 @@ function unHoldScreen() {
 function longCall(f) {
     return async () => {
         holdScreen();
-        hideNotification();
+        banner.hide();
         await f();
         unHoldScreen()
     }
@@ -202,7 +258,7 @@ const getSolverHealth = longCall(async () => {
     const text = await response.text();
 
     if (text != 'OK') {
-        notify('Error: Solver server is down.');
+        banner.showError('Solver server is down.');
     };
 })
 
@@ -222,10 +278,10 @@ const solve = longCall(async () => {
             fillGrid(content["grid"]);
             break;
         case "error":
-            notify(`Error: ${content["error"]}`);
+            banner.showError(`${content["error"]}`);
             break;
         default:
-            notify("Something went wrong")
+            banner.show("Something went wrong");
     };
 })
 
