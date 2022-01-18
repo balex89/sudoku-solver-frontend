@@ -24,12 +24,9 @@ async function waitStyle(elem, property) {
 
 content_style = getComputedStyle(document.getElementById("content"))
 
-const CONTENT_WIDTH = styleValueToNumber(content_style.getPropertyValue("--base-width"));
-const CONTENT_HEIGHT = styleValueToNumber(content_style.getPropertyValue("--base-height"));
-
 const BACKGROUND_BLUR = 3;
 
-const ZERROS_STRING = '0'.repeat(81)
+const ZEROS_STRING = '0'.repeat(81)
 
 
 // Cell value converters
@@ -165,7 +162,7 @@ async function encode_grid() {
     grid_history.push(getGrid());
     string = getStringifiedGrid()
     let code = null
-    if (string != ZERROS_STRING) {
+    if (string != ZEROS_STRING) {
 
         const response = await fetch(`/encode?numbers=${string}`);
         const content = await response.json();
