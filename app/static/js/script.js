@@ -169,13 +169,6 @@ async function validateCell(cell) {
 
 // Screen holding
 
-//function playAnimation() {
-//    a = document.getElementById("animated-svg");
-//    b = a.contentDocument;
-//    c = b.getElementById("e6flsqoxhzzs1");
-//    c.dispatchEvent(new Event("click"));
-//}
-
 function holdScreen() {
     setStyles(document.getElementById("foreground"), {
         "opacity": 1.0,
