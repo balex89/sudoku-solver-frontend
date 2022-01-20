@@ -255,7 +255,11 @@ body {
     font-size: 28px;
     caret-color: transparent;
     cursor: default;
-    transition: color 0.5s, font 0.5s;
+}
+
+.grid__input--invalid {
+    color:  red;
+    font-weight: 600;
 }
 
 .grid__input:focus {

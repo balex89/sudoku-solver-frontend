@@ -114,6 +114,50 @@ const grid_history = {
     }
 }
 
+const grid = {
+    rows: [],
+    columns: [],
+    squares: [],
+    getCell(i, j) {return $(`Cell(${i},${j})`)},
+    init() {
+        for (let i = 0; i < 9; i++) {
+            let row = [];
+            let column = [];
+            let square = [];
+            for (let j = 0; j < 9; j++) {
+                row.push(this.getCell(i, j));
+                column.push(this.getCell(j, i));
+                square.push(this.getCell(i - i % 3 + ~~(j / 3), (i % 3) * 3 + j % 3));
+            };
+            this.rows.push(row);
+            this.columns.push(column);
+            this.squares.push(square);
+        };
+    },
+    async validate() {
+        for (let v = 1; v <= 9; v++) {
+            let invalid_cells = [];
+            for (const view of [this.rows, this.columns, this.squares]) {
+                for (let i = 0; i < 9; i++) {
+                    cells = [];
+                    for (const cell of view[i]) {
+                        if (v == cell.value) {
+                            cells.push(cell);
+                            cell.classList.remove("grid__input--invalid");
+                        };
+                    };
+                    if (cells.length > 1) {
+                        invalid_cells = invalid_cells.concat(cells);
+                    }
+                };
+            };
+            for (const cell of invalid_cells) {
+                cell.classList.add("grid__input--invalid")
+            };
+        };
+    }
+};
+
 function getEmptyGrid() {
     return Array.from(
         Array(9).keys(),
@@ -206,17 +250,6 @@ function fillGrid(grid) {
         }
     };
     encode_grid();
-}
-
-async function validateCell(cell) {
-    const is_valid = await is_valid_grid();
-    if (is_valid === false) {
-        setStyles(cell, { "color": "red", "font-weight": 600 })
-    } else {
-        Array.from(document.getElementsByClassName("grid__input")).forEach(element => {
-            setStyles(element, { "color": "black", "font-weight": 400 })
-        });
-    }
 }
 
 
@@ -362,12 +395,13 @@ const previousCellValues = {}
 
 document.onkeydown = (e) => {
     const elem = document.activeElement;
-    if (elem.className == "grid__input") {
+    if (elem.classList.contains("grid__input")) {
         if (cellSetKeys.has(e.key)) {
             elem.value = e.key;
-            // validateCell(elem);
+            grid.validate();
         } else if (cellClearKeys.has(e.key)) {
             elem.value = "";
+            grid.validate();
         } else {
             return;
         };
@@ -401,7 +435,9 @@ window.onload = function () {
     };
     document.getElementById("grid").innerHTML = gridHtml;
 
+    grid.init();
     fillGrid(initialGrid ? initialGrid : getEmptyGrid());
+    grid.validate();
 
     setStyles(document.getElementById("initial-foreground"), {
         "opacity": 0.0,
