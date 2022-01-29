@@ -144,6 +144,7 @@ body {
 
 .glyph {
     width: var(--vwidth);
+    height: var(--vwidth);
 }
 
 #glyph-left {
@@ -265,6 +266,8 @@ body {
 
 .grid__input:disabled {
     color: black;
+    -webkit-text-fill-color: black;
+    opacity: 1;
     font-weight: 600;
     background-color: #f4f4f4;
 }
