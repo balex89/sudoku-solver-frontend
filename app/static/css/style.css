@@ -263,7 +263,7 @@ body {
     font-weight: 600;
 }
 
-.grid__input--locked {
+.grid__input:disabled {
     color: black;
     font-weight: 600;
     background-color: #f4f4f4;

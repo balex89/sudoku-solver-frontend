@@ -166,15 +166,10 @@ const grid = {
         };
     },
     lockCell(cell) {
-        cell.classList.add("grid__input--locked");
         cell.disabled = true;
     },
     unlockCell(cell) {
-        cell.classList.remove("grid__input--locked");
         cell.disabled = false;
-    },
-    isLockedCell(cell) {
-        return cell.classList.contains("grid__input--locked")
     },
     async lock(react=true) {
         for (const row of this.rows) {
@@ -199,7 +194,7 @@ const grid = {
         for (const row of this.rows) {
             for (const cell of row) {
                 if (cell.value) {                    
-                    if (this.isLockedCell(cell)) {
+                    if (cell.disabled) {
                         hasLocked = true;
                     } else {
                         hasUnlocked = true;
@@ -239,7 +234,7 @@ const grid = {
     unsolve() {
         for (const row of this.rows) {
             for (const cell of row) {
-                if (!this.isLockedCell(cell)) cell.value = "";
+                if (!cell.disabled) cell.value = "";
             }
         };
         this.onChange();
@@ -250,13 +245,13 @@ const grid = {
         $("btn-clear").innerHTML = this.getClearAction();
         encode_grid();
     },
-    getStringified() {
+    getStringified(lock_flags=true) {
         return Array.from(
             Array(81).keys(),
             i => {
                 cell = this.getCell((i - i % 9) / 9, i % 9);
                 cell_num = (cell.value == "") ? "0" : cell.value;
-                cell_num += this.isLockedCell(cell) ? "L" : ""; 
+                if (lock_flags) cell_num += cell.disabled ? "L" : ""; 
                 return cell_num;
             }
         ).join('');
@@ -278,7 +273,7 @@ const grid = {
             Array(9).keys(),
             i => Array.from(
                 Array(9).keys(),
-                j => this.isLockedCell(this.getCell(i, j))
+                j => this.getCell(i, j).disabled
             )
         );
     }
@@ -299,16 +294,9 @@ function getGrid() {
         Array(9).keys(),
         i => Array.from(
             Array(9).keys(),
-            j => toCellValue(document.getElementById(`Cell(${i},${j})`).value)
+            j => toCellValue(grid.getCell(i, j).value)
         )
     );
-}
-
-function getStringifiedGrid() {
-    return Array.from(
-        Array(81).keys(),
-        i => toCellNum(document.getElementById(`Cell(${(i - i % 9) / 9},${i % 9})`).value)
-    ).join('');
 }
 
 function equalGrid(grid_1, grid_2) {
@@ -430,7 +418,9 @@ const solve = longCall(async () => {
 
     switch (content["status"]) {
         case "ok":
-            grid.lock(false);
+            if (grid.getClearAction() == CLEAR_ACTION.clear) {
+                grid.lock(false);
+            };
             fillGrid(content["grid"]);
             break;
         case "error":
@@ -465,7 +455,7 @@ const generate = longCall(async () => {
 })
 
 const is_valid_grid = async () => {
-    const response = await fetch('/validate?' + new URLSearchParams({ "numbers": getStringifiedGrid() }));
+    const response = await fetch('/validate?' + new URLSearchParams({ "numbers": grid.getStringified(false) }));
     const content = await response.json();
     return content["is_valid"];
 };
@@ -523,7 +513,7 @@ const previousCellValues = {}
 document.onkeydown = (e) => {
     const elem = document.activeElement;
     if (elem.classList.contains("grid__input")) {
-        if (!(elem.classList.contains("grid__input--locked"))) {
+        if (!(elem.disabled)) {
             if (cellSetKeys.has(e.key)) {
                 elem.value = e.key;
                 grid.validate();
