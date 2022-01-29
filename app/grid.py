@@ -1,6 +1,6 @@
 class Grid(list):
     """
-        A Wrapper for a list of list of values (1,..,9 or None), representing Sudoku grid.
+        A Wrapper for a list of list of values (1,...,9 or None), representing Sudoku grid.
         Provides methods for compact URL-safe encoding of valid and invalid grids.
 
         Tip 1: Use encode_1() / decode_1() methods for valid grids.
@@ -17,12 +17,25 @@ class Grid(list):
         """
             Reads grid as a string of 81 values ("0" stands for a blank cell)
             given row by row, e.g.: "001003024020000056..."
+            If letter "L" follows a number, that means cell is locked,
+            so builds up a lock_code string of 81 zeros and ones, e.g. "00101100..."
         """
+        num_string = ""
+        lock_flags = ['0' for _ in range(81)]
+        pos = -1
+        for char in string:
+            if char == 'L':
+                lock_flags[pos] = '1'
+            else:
+                pos += 1
+                num_string += char
+
         return cls(
             [
-                [int(x) if (x := string[j * 9 + i]) != '0' else None for i in range(9)]
+                [int(x) if (x := num_string[j * 9 + i]) != '0' else None for i in range(9)]
                 for j in range(9)
-            ]
+            ],
+            ''.join(lock_flags) if '1' in lock_flags else None
         )
 
     class Squares:
@@ -53,7 +66,7 @@ class Grid(list):
         def __call__(self, i):
             return set(self[j] for j in range(len(self)) if j != i)
 
-    def __init__(self, seq=None):
+    def __init__(self, seq=None, lock_code=None):
         """
             Wraps sequence of lists of grid values.
         """
@@ -61,6 +74,7 @@ class Grid(list):
             seq = self.dummy()
         else:
             seq = [self.Batch(row) for row in seq]
+        self.lock_code = lock_code
         self.c = [self.Batch([seq[j][i] for j in range(9)]) for i in range(9)]
         self.s = self.Squares(self)
         super().__init__(seq)
@@ -262,3 +276,25 @@ class Grid(list):
             return cls.decode_1(bin_code=bin_code[1:])
         else:
             return cls.decode_3(bin_code=bin_code[2:])
+
+    def encode_locked(self):
+        """
+            Encodes grid and adds locked cells code after "~",
+            e.g: hGOsvL8D1EeIEooxA86ULJw6IHBwfw~gyRLFDAsaEEVIA
+        """
+        return self.encode() + ('~' + self.bin_to_b64(self.lock_code) if self.lock_code else '')
+
+    @staticmethod
+    def lock_mask(lock_code):
+        return [[int(lock_code[j * 9 + i]) for i in range(9)] for j in range(9)]
+
+    @classmethod
+    def decode_locked(cls, string):
+        """ The decoder for encode_locked(). Returns list of list of values (or Nones)
+            and a lock_mask of same dimension if locked cells exist
+        """
+        parts = string.split('~')
+        if len(parts) < 2:
+            return cls.decode(parts[0]), None
+        else:
+            return cls.decode(parts[0]), cls.lock_mask(cls.b64_to_bin(parts[1]))

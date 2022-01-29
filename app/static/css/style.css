@@ -255,11 +255,18 @@ body {
     font-size: 28px;
     caret-color: transparent;
     cursor: default;
+    color: #606060;
 }
 
 .grid__input--invalid {
     color:  red;
     font-weight: 600;
+}
+
+.grid__input--locked {
+    color: black;
+    font-weight: 600;
+    background-color: #f4f4f4;
 }
 
 .grid__input:focus {

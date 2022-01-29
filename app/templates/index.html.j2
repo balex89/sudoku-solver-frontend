@@ -14,7 +14,7 @@
                     src: url({{url_for("get_static", filename="fonts/Bruno Ace Regular.ttf" )}})
         }
     </style>
-    <script>initialGrid = {{grid}}</script>
+    <script>initialGrid = {{grid}}; initialLockMask = {{lock_mask}}</script>
     <script src={{url_for("get_static", filename="js/script.js" )}} defer></script>
 </head>
 
@@ -29,7 +29,7 @@
                 <div class="menu-section">
                     <button class="btn btn-main-menu" id="btn-generate" onclick="">GENERATE</button>
                     <button class="btn btn-main-menu" onclick="solve()">SOLVE</button>
-                    <button class="btn btn-main-menu" onclick="clearGrid()">CLEAR</button>
+                    <button class="btn btn-main-menu" onclick="grid.doClearAction()" id="btn-clear">CLEAR</button>
                     <button class="btn btn-main-menu btn-square" id="btn-revert" onclick="revertGrid()">
                         <img id="svg-revert" src={{url_for("get_static", filename="img/corner-up-left.svg")}}>
                     </button>

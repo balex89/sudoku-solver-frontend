@@ -28,6 +28,12 @@ const BACKGROUND_BLUR = 3;
 
 const ZEROS_STRING = '0'.repeat(81)
 
+const CLEAR_ACTION = {
+    unsolve: "UNSOLVE",
+    unlock: "UNLOCK",
+    clear: "CLEAR"
+}
+
 
 // Cell value converters
 
@@ -93,23 +99,26 @@ const banner = {
 
 const grid_history = {
     _hist: [],
-    push: function (grid) {
-        if (this._hist.length == 0 || !equalGrid(grid, this._hist[this._hist.length - 1])) {
-            this._hist.push(grid);
-            document.getElementById("btn-revert").disabled = (this._hist.length < 2);
+    push(grid, lock_mask) {
+        if (this._hist.length == 0 
+            || !equalGrid(grid, this._hist[this._hist.length - 1]["grid"])
+            || !equalGrid(lock_mask, this._hist[this._hist.length - 1]["lock_mask"])
+           ) {
+            this._hist.push({"grid": grid, "lock_mask": lock_mask});
+            $("btn-revert").disabled = (this._hist.length < 2);
         }
     },
-    pop: function () {
+    pop() {
         if (this._hist.length >= 2) {
             this._hist.pop();
             if (this._hist.length < 2) {
-                document.getElementById("btn-revert").disabled = true;
+                $("btn-revert").disabled = true;
             };
             return this._hist.pop();
         };
         return null;
     },
-    empty: function () {
+    empty() {
         this._hist = [];
     }
 }
@@ -155,6 +164,123 @@ const grid = {
                 cell.classList.add("grid__input--invalid")
             };
         };
+    },
+    lockCell(cell) {
+        cell.classList.add("grid__input--locked");
+        cell.disabled = true;
+    },
+    unlockCell(cell) {
+        cell.classList.remove("grid__input--locked");
+        cell.disabled = false;
+    },
+    isLockedCell(cell) {
+        return cell.classList.contains("grid__input--locked")
+    },
+    async lock(react=true) {
+        for (const row of this.rows) {
+            for (const cell of row) {
+                if (cell.value) this.lockCell(cell);
+            };
+        };
+        if (react) this.onChange();
+    },
+    async unlock(react=true) {
+        for (const row of this.rows) {
+            for (const cell of row) {
+                this.unlockCell(cell);
+            }
+        };
+        if (react) this.onChange();
+    },
+    getClearAction() {
+        var hasLocked = false;
+        var hasUnlocked = false;
+
+        for (const row of this.rows) {
+            for (const cell of row) {
+                if (cell.value) {                    
+                    if (this.isLockedCell(cell)) {
+                        hasLocked = true;
+                    } else {
+                        hasUnlocked = true;
+                    }
+                }
+            }
+        };
+        if (hasLocked && hasUnlocked) {
+            return CLEAR_ACTION.unsolve
+        } else if (hasLocked) {
+            return CLEAR_ACTION.unlock
+        } else {
+            return CLEAR_ACTION.clear
+        };
+    },
+    doClearAction() {
+        switch (this.getClearAction()) {
+            case  CLEAR_ACTION.unsolve:
+                this.unsolve();
+                break;
+            case CLEAR_ACTION.unlock:
+                this.unlock();
+                break;
+            case CLEAR_ACTION.clear:
+                this.clear();
+                break;
+        };
+    },
+    clear() {
+        for (const row of this.rows) {
+            for (const cell of row) {
+                cell.value = "";
+            }
+        };
+        this.unlock();
+    },
+    unsolve() {
+        for (const row of this.rows) {
+            for (const cell of row) {
+                if (!this.isLockedCell(cell)) cell.value = "";
+            }
+        };
+        this.onChange();
+    },
+    onChange() {
+        grid_history.push(getGrid(), grid.getLockMask());
+        this.validate();
+        $("btn-clear").innerHTML = this.getClearAction();
+        encode_grid();
+    },
+    getStringified() {
+        return Array.from(
+            Array(81).keys(),
+            i => {
+                cell = this.getCell((i - i % 9) / 9, i % 9);
+                cell_num = (cell.value == "") ? "0" : cell.value;
+                cell_num += this.isLockedCell(cell) ? "L" : ""; 
+                return cell_num;
+            }
+        ).join('');
+    },
+    lockFromMask(lock_mask) {
+        if (!lock_mask) return;
+        for (let i = 0; i < 9; i++) {
+            for (let j = 0; j < 9; j++) {
+                if (lock_mask[i][j]) {
+                    this.lockCell(this.getCell(i, j));
+                } else {
+                    this.unlockCell(this.getCell(i, j));
+                }
+            }
+        };
+    },
+    getLockMask() {
+        return Array.from(
+            Array(9).keys(),
+            i => Array.from(
+                Array(9).keys(),
+                j => this.isLockedCell(this.getCell(i, j))
+            )
+        );
     }
 };
 
@@ -203,9 +329,7 @@ function updateURLwithCode(code = null) {
 }
 
 async function encode_grid() {
-    grid_history.push(getGrid());
-    string = getStringifiedGrid()
-    let code = null
+    string = grid.getStringified();
     if (string != ZEROS_STRING) {
 
         const response = await fetch(`/encode?numbers=${string}`);
@@ -227,9 +351,10 @@ async function encode_grid() {
 }
 
 function revertGrid() {
-    let grid = grid_history.pop();
-    if (grid != null) {
-        fillGrid(grid);
+    let hist_point = grid_history.pop();
+    if (hist_point != null) {
+        grid.lockFromMask(hist_point["lock_mask"]);
+        fillGrid(hist_point["grid"]);
     };
 }
 
@@ -238,18 +363,18 @@ function clearGrid() {
         for (let j = 0; j < 9; j++) {
             document.getElementById(`Cell(${i},${j})`).value = "";
         }
-    }
-    encode_grid();
+    };
+    grid.onChange();
 }
 
-function fillGrid(grid) {
+function fillGrid(grid_, react=true) {
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
             cell = document.getElementById(`Cell(${i},${j})`);
-            cell.value = fromCellValue(grid[i][j]);
+            cell.value = fromCellValue(grid_[i][j]);
         }
     };
-    encode_grid();
+    if (react) grid.onChange();
 }
 
 
@@ -305,6 +430,7 @@ const solve = longCall(async () => {
 
     switch (content["status"]) {
         case "ok":
+            grid.lock(false);
             fillGrid(content["grid"]);
             break;
         case "error":
@@ -326,14 +452,15 @@ const generate = longCall(async () => {
 
     switch (content["status"]) {
         case "ok":
-            grid_history.empty();
-            fillGrid(content["grid"]);
+            grid.unlock(false);
+            fillGrid(content["grid"], false);
+            grid.lock();
             break;
         case "error":
-            notify(`Error: ${content["error"]}`);
+            banner.showError(`${content["error"]}`);
             break;
         default:
-            notify("Something went wrong")
+            banner.show("Something went wrong");
     };
 })
 
@@ -396,17 +523,19 @@ const previousCellValues = {}
 document.onkeydown = (e) => {
     const elem = document.activeElement;
     if (elem.classList.contains("grid__input")) {
-        if (cellSetKeys.has(e.key)) {
-            elem.value = e.key;
-            grid.validate();
-        } else if (cellClearKeys.has(e.key)) {
-            elem.value = "";
-            grid.validate();
-        } else {
-            return;
+        if (!(elem.classList.contains("grid__input--locked"))) {
+            if (cellSetKeys.has(e.key)) {
+                elem.value = e.key;
+                grid.validate();
+            } else if (cellClearKeys.has(e.key)) {
+                elem.value = "";
+                grid.validate();
+            } else {
+                return;
+            };
+            grid.onChange();
         };
         previousCellValues[elem.id] = elem.value;
-        encode_grid();
     }
 }
 
@@ -436,6 +565,7 @@ window.onload = function () {
     document.getElementById("grid").innerHTML = gridHtml;
 
     grid.init();
+    grid.lockFromMask(initialLockMask);
     fillGrid(initialGrid ? initialGrid : getEmptyGrid());
     grid.validate();
 
