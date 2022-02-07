@@ -1,6 +1,3 @@
-import logging
-
-
 class Grid(list):
     """
         A Wrapper for a list of list of values (1,...,9 or None), representing Sudoku grid.
@@ -48,6 +45,7 @@ class Grid(list):
             > squares[i, j] - including the (i, j) cell,
             > squares(i, j) - excluding it.
         """
+
         def __init__(self, rows):
             self.rows = rows
 
@@ -66,6 +64,7 @@ class Grid(list):
             A representation of a grid row or column.
             > batch(i) - returns set of batch values except the one in position i.
         """
+
         def __call__(self, i):
             return set(self[j] for j in range(len(self)) if j != i)
 
@@ -289,7 +288,7 @@ class Grid(list):
             return self.encode()
         reduced_flags = [flag for pos, flag in enumerate(self.lock_flags)
                          if self[pos // 9][pos % 9]]
-        if sum(reduced_flags)/len(reduced_flags) > 0.5:
+        if sum(reduced_flags) / len(reduced_flags) > 0.5:
             lock_code = '0' + ''.join(str(1 - flag) for flag in reduced_flags)
         else:
             lock_code = '1' + ''.join(str(flag) for flag in reduced_flags)
