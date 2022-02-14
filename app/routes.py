@@ -33,12 +33,16 @@ def get_static(filename):
 @app.route("/~<code>", subdomain=SUBDOMAIN)
 def sudoku(code=None):
     try:
-        grid = json.dumps(None if code is None else Grid.decode(code))
+        if code is None:
+            grid, lock_mask = None, None
+        else:
+            grid, lock_mask = Grid.decode_locked(code)
     except Exception as e:
         logger.exception('Invalid code string to decode: '
                          '"%s". Caused: %s. Redirecting to "/".', code, type(e).__name__)
         return redirect("/")
-    return render_template("index.html.j2", grid=grid, version=app.config["VERSION"])
+    return render_template("index.html.j2", grid=json.dumps(grid), lock_mask=json.dumps(lock_mask),
+                           version=app.config["VERSION"])
 
 
 @app.route("/favicon.ico", subdomain=SUBDOMAIN)
@@ -83,7 +87,7 @@ def get_task():
 @app.route("/encode", methods=["GET"], subdomain=SUBDOMAIN)
 def encode():
     numbers = request.args["numbers"]
-    return jsonify(status="ok", code=Grid.from_str(numbers).encode())
+    return jsonify(status="ok", code=Grid.from_str(numbers).encode_locked())
 
 
 @app.route("/validate", methods=["GET"], subdomain=SUBDOMAIN)

@@ -144,6 +144,7 @@ body {
 
 .glyph {
     width: var(--vwidth);
+    height: var(--vwidth);
 }
 
 #glyph-left {
@@ -255,11 +256,20 @@ body {
     font-size: 28px;
     caret-color: transparent;
     cursor: default;
+    color: #606060;
 }
 
 .grid__input--invalid {
     color:  red;
     font-weight: 600;
+}
+
+.grid__input:disabled {
+    color: black;
+    -webkit-text-fill-color: black;
+    opacity: 1;
+    font-weight: 600;
+    background-color: #f4f4f4;
 }
 
 .grid__input:focus {
