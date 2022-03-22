@@ -1,10 +1,11 @@
-# Sudoku Solver Frontend
+# Sudoku Solver Frontend by [Kalinbob](http://kalinbob.com)
 
 An HTTP web application serving user interface specifically for [this Sudoku Solver tool](https://github.com/balex89/sudoku-solver) (maintained by [@balex89](https://github.com/balex89)). Solver service API v1 is used.
 
+Try it now at [sudoku.kalinbob.com](http://sudoku.kalinbob.com)! 
 
-Provides a user with a [Sudoku](https://en.wikipedia.org/wiki/Sudoku) grid to fill in, and a button to show the solution in place.
-Works with [basic puzzle rules](https://www.learn-sudoku.com/sudoku-rules.html).
+The app provides a user with a [Sudoku](https://en.wikipedia.org/wiki/Sudoku) grid to fill in (manually or automatically by puzzle generator), tools to solve, unsolve, clear grid or undo recent changes.
+Works with [basic puzzle rules](https://www.learn-sudoku.com/sudoku-rules.html). Highlights cells that violate puzzle rules, if any.
 
 Featuring immediate URL-safe [grid encoding](#sudoku-grid-encoding).
 
@@ -112,7 +113,7 @@ Works well on desktop browsers:
 
 Best in 640 x 910 resolution or higher.
 
-_Mobile devices are poorly supported._
+_Most up-to-date mobile devices should be well-supported. Please report bugs and usability suggestions to [team@kalinbob.com](mailto:team@kalinbob.com)._
 
 ## Sudoku grid encoding
 
@@ -135,4 +136,4 @@ Aka Kalinbob team:
 - [@belnast5](https://github.com/belnast5)
 - [@balex89](https://github.com/balex89) (_Lead maintainer_)
 
-Feel free to contact: [balex89@gmail.com](mailto:balex89@gmail.com).
+Feel free to contact: [team@kalinbob.com](mailto:team@kalinbob.com).
