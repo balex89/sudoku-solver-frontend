@@ -73,26 +73,13 @@ def solve():
     return Response(resp.content, resp.status_code, resp.raw.headers.items())
 
 
-@app.route("/get_task", methods=["GET"], subdomain=SUBDOMAIN)
-def get_task():
-
-    resp = requests.request(
-        method="GET",
-        url=SOLVER_API_URL + "/get_task",
-        headers=request.headers,
-    )
-    return Response(resp.content, resp.status_code, resp.raw.headers.items())
-
-
+@app.route("/get_task", methods=["GET"], subdomain=SUBDOMAIN)  # TODO: delete
 @app.route("/task", methods=["GET"], subdomain=SUBDOMAIN)
 def task():
-    min_difficulty = request.args["min_difficulty"]
-    max_difficulty = request.args["max_difficulty"]
     resp = requests.request(
         method="GET",
-        url=SOLVER_API_URL + "/task"
-        + "?min_difficulty=" + str(min_difficulty)
-        + "&max_difficulty=" + str(max_difficulty),
+        url=SOLVER_API_URL + "/task",
+        params=request.args,
         headers=request.headers,
     )
     return Response(resp.content, resp.status_code, resp.raw.headers.items())

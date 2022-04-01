@@ -17,16 +17,3 @@ def test_validate(client):
     assert response.status_code == 200
     assert response.mimetype == mimetype
     assert isinstance(response.json.get("is_valid"), bool) is True
-
-
-def test_task(client):
-    mimetype = "application/json"
-    headers = {
-        "Accept": mimetype
-    }
-    response = client.get(path="/task",
-                          query_string={"min_difficulty": 1, "max_difficulty": 3},
-                          headers=headers)
-
-    assert response.status_code == 200
-    assert response.mimetype == mimetype
