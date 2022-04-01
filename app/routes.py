@@ -73,12 +73,13 @@ def solve():
     return Response(resp.content, resp.status_code, resp.raw.headers.items())
 
 
-@app.route("/get_task", methods=["GET"], subdomain=SUBDOMAIN)
-def get_task():
-
+@app.route("/get_task", methods=["GET"], subdomain=SUBDOMAIN)  # TODO: delete
+@app.route("/task", methods=["GET"], subdomain=SUBDOMAIN)
+def task():
     resp = requests.request(
         method="GET",
-        url=SOLVER_API_URL + "/get_task",
+        url=SOLVER_API_URL + "/task",
+        params=request.args,
         headers=request.headers,
     )
     return Response(resp.content, resp.status_code, resp.raw.headers.items())

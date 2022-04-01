@@ -25,7 +25,7 @@ jobs:
       - name: Lint with flake8
         run: |
           # stop the build if any pep8 rule violated (except complexity)
-          flake8 . --count --ignore=C901 --show-source --max-line-length=100 --statistics
+          flake8 . --count --ignore=C901,W503 --show-source --max-line-length=100 --statistics
           # exit-zero treats all errors as warnings.
           flake8 . --count --select=C901 --exit-zero --max-complexity=10 --statistics
 
