@@ -387,12 +387,19 @@ function unHoldScreen() {
 
 // Service calling
 
+let long_calls = 0;
+
 function longCall(f) {
     return async () => {
         holdScreen();
+        long_calls++;
         banner.hide();
         await f();
-        unHoldScreen()
+        long_calls--;
+        if (long_calls <= 0) {
+            long_calls = 0;
+            unHoldScreen();
+        }
     }
 }
 
@@ -431,8 +438,9 @@ const solve = longCall(async () => {
     };
 })
 
-const generate = longCall(async () => {
-    const response = await fetch('/get_task', {
+const generate = (min_, max_) => longCall(async () => {
+    const response = await fetch(
+        '/get_task?' + new URLSearchParams({ "min_difficulty": min_, "max_difficulty": max_ }), {
         method: 'GET',
         headers: {
             'Accept': 'application/json'
@@ -452,7 +460,7 @@ const generate = longCall(async () => {
         default:
             banner.show("Something went wrong");
     };
-})
+})();
 
 const is_valid_grid = async () => {
     const response = await fetch('/validate?' + new URLSearchParams({ "numbers": grid.getStringified(false) }));
@@ -555,9 +563,13 @@ window.onload = function () {
     document.getElementById("grid").innerHTML = gridHtml;
 
     grid.init();
-    grid.lockFromMask(initialLockMask);
-    fillGrid(initialGrid ? initialGrid : getEmptyGrid());
-    grid.validate();
+    if (initialGrid) {
+        grid.lockFromMask(initialLockMask);
+        fillGrid(initialGrid ? initialGrid : getEmptyGrid());
+        grid.validate();
+    } else {
+        generate(0, 0);
+    };
 
     setStyles(document.getElementById("initial-foreground"), {
         "opacity": 0.0,
